@@ -1,10 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_hotels_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+
 
 class MainView extends StatefulWidget {
-  const MainView({super.key});
+  final String name;
+   const MainView({super.key, required this.name});
 
   @override
   State<MainView> createState() => _MainViewState();
