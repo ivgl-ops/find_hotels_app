@@ -1,5 +1,6 @@
 import 'package:find_hotels_app/firebase/get_hotels.dart';
 import 'package:find_hotels_app/view/main_view.dart';
+import 'package:find_hotels_app/view/num_person_view.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const MainView(),
+        home: const NumPersonView(),
       ),
     );
   }
