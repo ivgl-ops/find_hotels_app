@@ -148,7 +148,6 @@ class _MainViewState extends State<MainView> {
                   child: CircularProgressIndicator(),
                 );
               }
-
               return ListView.builder(
                 scrollDirection: Axis.vertical,
                 shrinkWrap: true,
