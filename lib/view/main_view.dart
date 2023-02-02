@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import '../firebase/get_hotels.dart';
 import '../widgets/custom_text.dart';
 
-class MainView extends StatefulWidget {
+class MainView extends StatefulWidget { 
   const MainView({
     super.key,
   });
@@ -18,16 +18,20 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
-  DateTimeRange dateRange =
-      DateTimeRange(start: DateTime.now(), end: DateTime.now());
+  DateTimeRange dateRange = DateTimeRange(
+      start: DateTime.now(), end: DateTime.now().add(const Duration(days: 6)));
+  final startYear = int.parse(DateFormat('yyyy').format(DateTime.now()));
+  final startMounth = int.parse(DateFormat('M').format(DateTime.now()));
+  final startDays = int.parse(DateFormat('d').format(DateTime.now()));
 
   Future pickDateRange() async {
-    int timestamp = DateTime.now().millisecondsSinceEpoch;
     DateTimeRange? newDateRange = await showDateRangePicker(
         context: context,
+        helpText: 'Выберите дату заселения и выселения',
+        saveText: 'Сохранить',
         initialDateRange: dateRange,
-        firstDate: DateTime(1900),
-        lastDate: DateTime(2100));
+        firstDate: DateTime(startYear, startMounth, startDays),
+        lastDate: DateTime(startYear+1, startMounth + 1));
     if (newDateRange == null) return;
     setState(() => dateRange = newDateRange);
   }
@@ -64,7 +68,7 @@ class _MainViewState extends State<MainView> {
                           child: const CustomText(
                             align: TextAlign.center,
                             text:
-                                "Найдите лучшие предложения на отели,апартаменты\n и многое другое...",
+                                "Найдите лучшие предложения на отели, апартаменты\n и многое другое...",
                             color: Colors.white,
                             size: 23,
                             fontWeight: FontWeight.bold,
