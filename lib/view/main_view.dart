@@ -1,5 +1,6 @@
 import 'package:animate_gradient/animate_gradient.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:find_hotels_app/data/search_hotels.dart';
 import 'package:find_hotels_app/viewModel/num_person_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -23,6 +24,13 @@ class _MainViewState extends State<MainView> {
   final startYear = int.parse(DateFormat('yyyy').format(DateTime.now()));
   final startMounth = int.parse(DateFormat('M').format(DateTime.now()));
   final startDays = int.parse(DateFormat('d').format(DateTime.now()));
+  final cityController = TextEditingController();
+
+  @override
+  void dispose() {
+    cityController.dispose();
+    super.dispose();
+  }
 
   Future pickDateRange() async {
     DateTimeRange? newDateRange = await showDateRangePicker(
@@ -80,6 +88,7 @@ class _MainViewState extends State<MainView> {
                               top: 30, left: 30, right: 30),
                           height: 40,
                           child: TextField(
+                            controller: cityController,
                             decoration: InputDecoration(
                                 filled: true,
                                 fillColor: Colors.white,
@@ -101,7 +110,17 @@ class _MainViewState extends State<MainView> {
                                 ),
                                 suffixIcon: IconButton(
                                   icon: const Icon(Icons.search),
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.pushNamed(context, '/search',
+                                        arguments: SearchHotels(
+                                            start,
+                                            end,
+                                            cityController.text,
+                                            Provider.of<NumPersonViewModel>(
+                                                    context, listen: false)
+                                                .total
+                                                .toString()));
+                                  },
                                 )),
                           ),
                         ),
