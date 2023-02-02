@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import '../firebase/get_hotels.dart';
 import '../widgets/custom_text.dart';
 
-class MainView extends StatefulWidget { 
+class MainView extends StatefulWidget {
   const MainView({
     super.key,
   });
@@ -29,9 +29,10 @@ class _MainViewState extends State<MainView> {
         context: context,
         helpText: 'Выберите дату заселения и выселения',
         saveText: 'Сохранить',
+        locale: const Locale("ru"),
         initialDateRange: dateRange,
         firstDate: DateTime(startYear, startMounth, startDays),
-        lastDate: DateTime(startYear+1, startMounth + 1));
+        lastDate: DateTime(startYear + 1, startMounth + 1));
     if (newDateRange == null) return;
     setState(() => dateRange = newDateRange);
   }
