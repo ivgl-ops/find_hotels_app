@@ -1,5 +1,4 @@
 import 'package:find_hotels_app/firebase/get_hotels.dart';
-import 'package:find_hotels_app/view/calendar_view.dart';
 import 'package:find_hotels_app/view/main_view.dart';
 import 'package:find_hotels_app/view/num_person_view.dart';
 import 'package:find_hotels_app/viewModel/num_person_viewmodel.dart';
