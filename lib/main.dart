@@ -32,10 +32,10 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         routes: {
-          '/num': (context) => const NumPersonView(), 
+          '/num': (context) => const NumPersonView(),
           '/main': (context) => const MainView()
         },
-        home: const CalendarView(),
+        home: const MainView(),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:animate_gradient/animate_gradient.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_hotels_app/viewModel/num_person_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../firebase/get_hotels.dart';
@@ -17,8 +18,25 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
+  DateTimeRange dateRange =
+      DateTimeRange(start: DateTime.now(), end: DateTime.now());
+
+  Future pickDateRange() async {
+    int timestamp = DateTime.now().millisecondsSinceEpoch;
+    DateTimeRange? newDateRange = await showDateRangePicker(
+        context: context,
+        initialDateRange: dateRange,
+        firstDate: DateTime(1900),
+        lastDate: DateTime(2100));
+    if (newDateRange == null) return;
+    setState(() => dateRange = newDateRange);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final start = dateRange.start;
+    final end = dateRange.end;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -53,8 +71,8 @@ class _MainViewState extends State<MainView> {
                           ),
                         ),
                         Container(
-                          margin:
-                              const EdgeInsets.only(top: 30, left: 30, right: 30),
+                          margin: const EdgeInsets.only(
+                              top: 30, left: 30, right: 30),
                           height: 40,
                           child: TextField(
                             decoration: InputDecoration(
@@ -86,7 +104,7 @@ class _MainViewState extends State<MainView> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Container(
-                              padding:const EdgeInsets.only(right: 15),
+                              padding: const EdgeInsets.only(right: 15),
                               height: 40,
                               margin: const EdgeInsets.only(left: 30, top: 20),
                               decoration: BoxDecoration(
@@ -98,9 +116,15 @@ class _MainViewState extends State<MainView> {
                                       margin: const EdgeInsets.only(
                                           left: 10, right: 14),
                                       child: const Icon(Icons.calendar_today)),
-                                  const CustomText(
-                                    text: "2 августа - 10 августа",
-                                    fontWeight: FontWeight.bold,
+                                  GestureDetector(
+                                    onTap: () {
+                                      pickDateRange();
+                                    },
+                                    child: CustomText(
+                                      text:
+                                          "с ${DateFormat('MM/dd').format(start)} до ${DateFormat('MM/dd').format(end)} ",
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   )
                                 ],
                               ),
@@ -112,7 +136,8 @@ class _MainViewState extends State<MainView> {
                               child: Container(
                                 padding: const EdgeInsets.only(right: 15),
                                 height: 40,
-                                margin: const EdgeInsets.only(top: 20, right: 30),
+                                margin:
+                                    const EdgeInsets.only(top: 20, right: 30),
                                 decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(50)),
@@ -126,8 +151,8 @@ class _MainViewState extends State<MainView> {
                                           size: 28,
                                         )),
                                     CustomText(
-                                      text: context
-                                          .read<NumPersonViewModel>()
+                                      text: Provider.of<NumPersonViewModel>(
+                                              context)
                                           .total
                                           .toString(),
                                       fontWeight: FontWeight.bold,
@@ -153,15 +178,13 @@ class _MainViewState extends State<MainView> {
             ),
             StreamBuilder(
               stream: Provider.of<GetHotel>(context).hotel.snapshots(),
-              builder:
-                  (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData) {
-                 
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
                 } else {
-                  
                   return ListView.builder(
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
