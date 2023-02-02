@@ -11,11 +11,11 @@ class CustomText extends StatelessWidget {
       this.color,
       this.underline});
 
+  final TextAlign? align;
+  final Color? color;
   final FontWeight? fontWeight;
   final double? size;
   final String text;
-  final TextAlign? align;
-  final Color? color;
   final TextDecoration? underline;
 
   @override

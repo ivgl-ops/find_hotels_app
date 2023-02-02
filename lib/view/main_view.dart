@@ -156,12 +156,12 @@ class _MainViewState extends State<MainView> {
               builder:
                   (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData) {
-                  print(snapshot.hasData);
+                 
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
                 } else {
-                  print(snapshot.hasData);
+                  
                   return ListView.builder(
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,

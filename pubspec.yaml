@@ -20,6 +20,7 @@ dependencies:
   google_fonts: ^4.0.0
   firebase_core: ^2.4.1
   cloud_firestore: ^4.3.1
+  intl: ^0.17.0
   animate_gradient: ^0.0.2
   unicons: ^2.1.0
   
