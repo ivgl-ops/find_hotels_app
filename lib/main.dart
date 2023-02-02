@@ -1,4 +1,5 @@
 import 'package:find_hotels_app/firebase/get_hotels.dart';
+import 'package:find_hotels_app/view/calendar_view.dart';
 import 'package:find_hotels_app/view/main_view.dart';
 import 'package:find_hotels_app/view/num_person_view.dart';
 import 'package:find_hotels_app/viewModel/num_person_viewmodel.dart';
@@ -17,6 +18,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -33,7 +35,7 @@ class MyApp extends StatelessWidget {
           '/num': (context) => const NumPersonView(), 
           '/main': (context) => const MainView()
         },
-        home: const MainView(),
+        home: const CalendarView(),
       ),
     );
   }
