@@ -1,4 +1,3 @@
-import 'package:animate_gradient/animate_gradient.dart';
 import 'package:find_hotels_app/viewModel/num_person_viewmodel.dart';
 import 'package:find_hotels_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';

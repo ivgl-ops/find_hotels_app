@@ -1,8 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_hotels_app/data/search_hotels.dart';
 import 'package:find_hotels_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+
 import 'package:intl/intl.dart';
 
 class ListHotelsView extends StatefulWidget {
@@ -16,6 +16,8 @@ class _ListHotelsViewState extends State<ListHotelsView> {
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as SearchHotels;
+    final CollectionReference place =
+        FirebaseFirestore.instance.collection(args.city.toLowerCase());
     return Scaffold(
         appBar: AppBar(),
         body: SingleChildScrollView(
@@ -94,7 +96,73 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                     ),
                   ),
                 ],
-              )
+              ),
+              StreamBuilder(
+                stream: place.snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (!snapshot.hasData) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (snapshot.data!.docs.isEmpty) {
+                    return Center(
+                      child: Column(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(top: 100, bottom: 20),
+                            child: const CustomText(
+                                text: 'Данного напраления пока не существует'),
+                          ),
+                          GestureDetector(
+                            onTap: (() {
+                              Navigator.pop(context);
+                            }),
+                            child: Container(
+                                width: 300,
+                                height: 50,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xff007AFF),
+                                ),
+                                child: const Center(
+                                  child: CustomText(
+                                    text: 'Вернуться на главную страницу',
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )),
+                          )
+                        ],
+                      ),
+                    );
+                  } else {
+                    return ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        final DocumentSnapshot documentSnapshot =
+                            snapshot.data!.docs[index];
+                        return Container(
+                          width: 190,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          margin: const EdgeInsets.only(left: 20, top: 20),
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20))),
+                          child: Column(
+                            children: [
+                              CustomText(text: documentSnapshot['name'])
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  }
+                },
+              ),
             ],
           ),
         ));
