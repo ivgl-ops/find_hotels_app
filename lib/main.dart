@@ -5,6 +5,7 @@ import 'package:find_hotels_app/viewModel/num_person_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'firebase/firebase_options.dart';
 
 void main() async {
@@ -26,6 +27,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => NumPersonViewModel())
       ],
       child: MaterialApp(
+        localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
+        supportedLocales: const [Locale('ru'), Locale('fr')],
         title: 'Flutter Demo',
         theme: ThemeData(
           primarySwatch: Colors.blue,

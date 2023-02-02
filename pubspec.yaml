@@ -23,8 +23,12 @@ dependencies:
   intl: ^0.17.0
   animate_gradient: ^0.0.2
   unicons: ^2.1.0
+  flutter_localizations:
+    sdk: flutter
   
-
+flutter_localizations:
+    sdk: flutter  
+    
 dev_dependencies:
   flutter_test:
     sdk: flutter
