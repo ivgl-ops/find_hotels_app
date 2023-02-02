@@ -182,7 +182,7 @@ class _MainViewState extends State<MainView> {
               ),
             ),
             StreamBuilder(
-              stream: Provider.of<GetHotel>(context).hotel.snapshots(),
+              stream: Provider.of<GetHotel>(context).offer.snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData) {
@@ -190,24 +190,44 @@ class _MainViewState extends State<MainView> {
                     child: CircularProgressIndicator(),
                   );
                 } else {
-                  return ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.docs.length,
-                    itemBuilder: (context, index) {
-                      final DocumentSnapshot documentSnapshot =
-                          snapshot.data!.docs[index];
-                      return Card(
-                        child: ListTile(
-                          title: Text(
-                            documentSnapshot['name'],
+                  return SizedBox(
+                    height: 170,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.docs.length,
+                      itemBuilder: (context, index) {
+                        final DocumentSnapshot documentSnapshot =
+                            snapshot.data!.docs[index];
+                        return Container(
+                          width: 190,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          margin: const EdgeInsets.only(left: 20, top: 20),
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20))),
+                          child: Column(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image(
+                                    width: 150,
+                                    height: 100,
+                                    fit: BoxFit.fill,
+                                    image: NetworkImage(
+                                        documentSnapshot['img'].toString())),
+                              ),
+                              Container(
+                                  margin: const EdgeInsets.only(top: 10),
+                                  child: CustomText(
+                                      text: documentSnapshot['name']))
+                            ],
                           ),
-                          subtitle: Text(
-                            documentSnapshot['price'].toString(),
-                          ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   );
                 }
               },

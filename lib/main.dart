@@ -27,7 +27,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => NumPersonViewModel())
       ],
       child: MaterialApp(
-        localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
         supportedLocales: const [Locale('ru'), Locale('fr')],
         title: 'Flutter Demo',
         theme: ThemeData(
