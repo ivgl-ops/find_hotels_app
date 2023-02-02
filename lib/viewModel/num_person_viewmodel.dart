@@ -63,6 +63,7 @@ class NumPersonViewModel extends ChangeNotifier {
 
   void totalPeople() {
     total = counterAdults + counterChildren;
+
     notifyListeners();
   }
 }

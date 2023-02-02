@@ -1,10 +1,12 @@
 import 'package:find_hotels_app/firebase/get_hotels.dart';
+import 'package:find_hotels_app/view/list_hotels_view.dart';
 import 'package:find_hotels_app/view/main_view.dart';
 import 'package:find_hotels_app/view/num_person_view.dart';
 import 'package:find_hotels_app/viewModel/num_person_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'firebase/firebase_options.dart';
 
 void main() async {
@@ -17,6 +19,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -25,13 +28,20 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => NumPersonViewModel())
       ],
       child: MaterialApp(
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('ru'), Locale('fr')],
         title: 'Flutter Demo',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
         routes: {
-          '/num': (context) => const NumPersonView(), 
-          '/main': (context) => const MainView()
+          '/num': (context) => const NumPersonView(),
+          '/main': (context) => const MainView(),
+          '/search': ((context) => const ListHotelsView())
         },
         home: const MainView(),
       ),
