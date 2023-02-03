@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_hotels_app/data/search_hotels.dart';
+import 'package:find_hotels_app/data/sort.dart';
 import 'package:find_hotels_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class ListHotelsView extends StatefulWidget {
   const ListHotelsView({super.key});
@@ -13,6 +15,7 @@ class ListHotelsView extends StatefulWidget {
 }
 
 class _ListHotelsViewState extends State<ListHotelsView> {
+  String _selectedGender = 'От 0 до 10';
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as SearchHotels;
@@ -38,6 +41,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
           ),
         ),
         body: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
           child: Column(
             children: [
               Container(
@@ -58,24 +62,106 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                   ),
                 ),
               ),
+              //TODO: сделать POPUPMENU
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Container(
-                    width: 156,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      color: const Color(0xffE7E7E7),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: const [
-                        Icon(
-                          Icons.sort,
-                        ),
-                        CustomText(text: "Сортировать")
-                      ],
+                  GestureDetector(
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Column(
+                              children: [
+                                AlertDialog(
+                                  scrollable: true,
+                                  title: const CustomText(
+                                    text: 'Сортировать по: ',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  content: Column(
+                                    children: [
+                                      ListTile(
+                                        leading: Radio<String>(
+                                          value: 'От 0 до 10',
+                                          groupValue: _selectedGender,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _selectedGender = value!;
+                                            });
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                        title: const CustomText(
+                                            text: 'Оценка (от 10 до 0)'),
+                                      ),
+                                      ListTile(
+                                        leading: Radio<String>(
+                                          value: 'От 10 до 0',
+                                          groupValue: _selectedGender,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _selectedGender = value!;
+                                            });
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                        title: const CustomText(
+                                            text: 'Оценка (от 0 до 10)'),
+                                      ),
+                                      ListTile(
+                                        leading: Radio<String>(
+                                          value: 'дешево',
+                                          groupValue: _selectedGender,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _selectedGender = value!;
+                                            });
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                        title: const CustomText(
+                                            text:
+                                                'Цена (от самой низкой к самой высокой)'),
+                                      ),
+                                      ListTile(
+                                        leading: Radio<String>(
+                                          value: 'дорого',
+                                          groupValue: _selectedGender,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _selectedGender = value!;
+                                            });
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                        title: const CustomText(
+                                            text:
+                                                'Цена (от самой высокой к самой низкой)'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          });
+                    },
+                    child: Container(
+                      width: 156,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        color: const Color(0xffE7E7E7),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: const [
+                          Icon(
+                            Icons.sort,
+                          ),
+                          CustomText(text: "Сортировать")
+                        ],
+                      ),
                     ),
                   ),
                   Container(
@@ -114,6 +200,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                   ),
                 ],
               ),
+
               StreamBuilder(
                 stream: place.snapshots(),
                 builder: (BuildContext context,
@@ -154,12 +241,14 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                     );
                   } else {
                     return ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(10),
                       itemCount: snapshot.data!.docs.length,
+                      shrinkWrap: true,
                       itemBuilder: (context, index) {
                         final DocumentSnapshot documentSnapshot =
                             snapshot.data!.docs[index];
+                        print(documentSnapshot['name']);
                         return Container(
                           width: double.infinity,
                           height: 300,
@@ -169,93 +258,94 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                               color: Color(0xffE7E7E7),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(20))),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Center(
-                                child: Stack(
-                                  children: [
-                                    Container(
-                                      margin: const EdgeInsets.only(top: 15),
-                                      height: 150,
-                                      width: 320,
-                                      child: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(25.0),
-                                        child: Image.network(
-                                          documentSnapshot['img'],
-                                          fit: BoxFit.cover,
+                          child:  Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Center(
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        margin: const EdgeInsets.only(top: 15),
+                                        height: 150,
+                                        width: 320,
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(25.0),
+                                          child: Image.network(
+                                            documentSnapshot['img'],
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    const Positioned(
-                                        top: 25,
-                                        right: 15,
-                                        child:
-                                            Icon(Icons.favorite_border_rounded))
-                                  ],
+                                      const Positioned(
+                                          top: 25,
+                                          right: 15,
+                                          child:
+                                              Icon(Icons.favorite_border_rounded))
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.only(top: 10),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        const Icon(
-                                          Icons.people_outline,
-                                          color: Colors.blue,
-                                        ),
-                                        const SizedBox(
-                                          width: 15,
-                                        ),
-                                        CustomText(
-                                            text: documentSnapshot['rate']),
-                                      ],
-                                    ),
-                                    const CustomText(
-                                        text: '1 спальня 2 человека')
-                                  ],
+                                Container(
+                                  margin: const EdgeInsets.only(top: 10),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          const Icon(
+                                            Icons.people_outline,
+                                            color: Colors.blue,
+                                          ),
+                                          const SizedBox(
+                                            width: 15,
+                                          ),
+                                          CustomText(
+                                              text: documentSnapshot['rate']),
+                                        ],
+                                      ),
+                                      const CustomText(
+                                          text: '1 спальня 2 человека')
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                margin:
-                                    const EdgeInsets.only(left: 50, top: 10),
-                                child: CustomText(
-                                  text: documentSnapshot['name'],
-                                  align: TextAlign.start,
-                                  size: 17,
-                                  fontWeight: FontWeight.bold,
+                                Container(
+                                  margin:
+                                      const EdgeInsets.only(left: 50, top: 10),
+                                  child: CustomText(
+                                    text: documentSnapshot['name'],
+                                    align: TextAlign.start,
+                                    size: 17,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                margin:
-                                    const EdgeInsets.only(left: 50, top: 10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CustomText(
-                                      text:
-                                          ('${(args.days.inDays.toInt() + 1) * int.parse(documentSnapshot['price'])} ₽')
-                                              .toString(),
-                                      align: TextAlign.start,
-                                      size: 13,
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    CustomText(
+                                Container(
+                                  margin:
+                                      const EdgeInsets.only(left: 50, top: 10),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      CustomText(
                                         text:
-                                            "За ${args.days.inDays + 1} ночей и ${args.people} гостей")
-                                  ],
+                                            ('${(args.days.inDays.toInt() + 1) * int.parse(documentSnapshot['price'])} ₽')
+                                                .toString(),
+                                        align: TextAlign.start,
+                                        size: 13,
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      CustomText(
+                                          text:
+                                              "За ${args.days.inDays + 1} ночей и ${args.people} гостей")
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
+                              ],
+                            ),
+                        
                         );
                       },
                     );
