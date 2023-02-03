@@ -19,7 +19,24 @@ class _ListHotelsViewState extends State<ListHotelsView> {
     final CollectionReference place =
         FirebaseFirestore.instance.collection(args.city.toLowerCase());
     return Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(
+          elevation: 0.0,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.blue,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          backgroundColor: Colors.white,
+          title: const CustomText(
+            text: "Вернуться на главную",
+            size: 16,
+            color: Colors.blue,
+          ),
+        ),
         body: SingleChildScrollView(
           child: Column(
             children: [
@@ -144,17 +161,99 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                         final DocumentSnapshot documentSnapshot =
                             snapshot.data!.docs[index];
                         return Container(
-                          width: 190,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          margin: const EdgeInsets.only(left: 20, top: 20),
+                          width: double.infinity,
+                          height: 300,
+                          margin: const EdgeInsets.only(
+                              left: 40, top: 20, right: 40),
                           decoration: const BoxDecoration(
-                              color: Colors.white,
+                              color: Color(0xffE7E7E7),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(20))),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              CustomText(text: documentSnapshot['name'])
+                              Center(
+                                child: Stack(
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 15),
+                                      height: 150,
+                                      width: 320,
+                                      child: ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(25.0),
+                                        child: Image.network(
+                                          documentSnapshot['img'],
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    const Positioned(
+                                        top: 25,
+                                        right: 15,
+                                        child:
+                                            Icon(Icons.favorite_border_rounded))
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(top: 10),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        const Icon(
+                                          Icons.people_outline,
+                                          color: Colors.blue,
+                                        ),
+                                        const SizedBox(
+                                          width: 15,
+                                        ),
+                                        CustomText(
+                                            text: documentSnapshot['rate']),
+                                      ],
+                                    ),
+                                    const CustomText(
+                                        text: '1 спальня 2 человека')
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                margin:
+                                    const EdgeInsets.only(left: 50, top: 10),
+                                child: CustomText(
+                                  text: documentSnapshot['name'],
+                                  align: TextAlign.start,
+                                  size: 17,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Container(
+                                margin:
+                                    const EdgeInsets.only(left: 50, top: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomText(
+                                      text:
+                                          ('${(args.days.inDays.toInt() + 1) * int.parse(documentSnapshot['price'])} ₽')
+                                              .toString(),
+                                      align: TextAlign.start,
+                                      size: 13,
+                                    ),
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    CustomText(
+                                        text:
+                                            "За ${args.days.inDays + 1} ночей и ${args.people} гостей")
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         );
