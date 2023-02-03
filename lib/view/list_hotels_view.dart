@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../firebase/get_hotels.dart';
+
 class ListHotelsView extends StatefulWidget {
   const ListHotelsView({super.key});
 
@@ -15,12 +17,16 @@ class ListHotelsView extends StatefulWidget {
 }
 
 class _ListHotelsViewState extends State<ListHotelsView> {
-  String _selectedGender = 'От 0 до 10';
+  String _selectedGender = 'От 10 до 0';
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as SearchHotels;
-    final CollectionReference place =
-        FirebaseFirestore.instance.collection(args.city.toLowerCase());
+
+    final Query<Map<String, dynamic>> place = FirebaseFirestore.instance
+        .collection(args.city.toLowerCase())
+        .orderBy(context.watch<GetHotel>().getHotels,
+            descending: context.watch<GetHotel>().maxtoMinRate);
+
     return Scaffold(
         appBar: AppBar(
           elevation: 0.0,
@@ -40,7 +46,8 @@ class _ListHotelsViewState extends State<ListHotelsView> {
             color: Colors.blue,
           ),
         ),
-        body: SingleChildScrollView(
+        body: Scrollbar(
+            child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Column(
             children: [
@@ -88,12 +95,14 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                                           onChanged: (value) {
                                             setState(() {
                                               _selectedGender = value!;
+                                              
                                             });
+                                            context.read<GetHotel>().changeRateMin();
                                             Navigator.pop(context);
                                           },
                                         ),
                                         title: const CustomText(
-                                            text: 'Оценка (от 10 до 0)'),
+                                            text: 'Оценка (от 0 до 10)'),
                                       ),
                                       ListTile(
                                         leading: Radio<String>(
@@ -103,11 +112,12 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                                             setState(() {
                                               _selectedGender = value!;
                                             });
+                                            context.read<GetHotel>().changeRateMax();
                                             Navigator.pop(context);
                                           },
                                         ),
                                         title: const CustomText(
-                                            text: 'Оценка (от 0 до 10)'),
+                                            text: 'Оценка (от 10 до 0)'),
                                       ),
                                       ListTile(
                                         leading: Radio<String>(
@@ -117,6 +127,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                                             setState(() {
                                               _selectedGender = value!;
                                             });
+                                            context.read<GetHotel>().changeRateMin();
                                             Navigator.pop(context);
                                           },
                                         ),
@@ -132,6 +143,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                                             setState(() {
                                               _selectedGender = value!;
                                             });
+                                            context.read<GetHotel>().changeRateMax();
                                             Navigator.pop(context);
                                           },
                                         ),
@@ -241,7 +253,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                     );
                   } else {
                     return ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(10),
                       itemCount: snapshot.data!.docs.length,
                       shrinkWrap: true,
@@ -258,94 +270,93 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                               color: Color(0xffE7E7E7),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(20))),
-                          child:  Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Center(
-                                  child: Stack(
-                                    children: [
-                                      Container(
-                                        margin: const EdgeInsets.only(top: 15),
-                                        height: 150,
-                                        width: 320,
-                                        child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(25.0),
-                                          child: Image.network(
-                                            documentSnapshot['img'],
-                                            fit: BoxFit.cover,
-                                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Center(
+                                child: Stack(
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 15),
+                                      height: 150,
+                                      width: 320,
+                                      child: ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(25.0),
+                                        child: Image.network(
+                                          documentSnapshot['img'],
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
-                                      const Positioned(
-                                          top: 25,
-                                          right: 15,
-                                          child:
-                                              Icon(Icons.favorite_border_rounded))
-                                    ],
-                                  ),
+                                    ),
+                                    const Positioned(
+                                        top: 25,
+                                        right: 15,
+                                        child:
+                                            Icon(Icons.favorite_border_rounded))
+                                  ],
                                 ),
-                                Container(
-                                  margin: const EdgeInsets.only(top: 10),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          const Icon(
-                                            Icons.people_outline,
-                                            color: Colors.blue,
-                                          ),
-                                          const SizedBox(
-                                            width: 15,
-                                          ),
-                                          CustomText(
-                                              text: documentSnapshot['rate']),
-                                        ],
-                                      ),
-                                      const CustomText(
-                                          text: '1 спальня 2 человека')
-                                    ],
-                                  ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(top: 10),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        const Icon(
+                                          Icons.people_outline,
+                                          color: Colors.blue,
+                                        ),
+                                        const SizedBox(
+                                          width: 15,
+                                        ),
+                                        CustomText(
+                                            text: documentSnapshot['rate']),
+                                      ],
+                                    ),
+                                    const CustomText(
+                                        text: '1 спальня 2 человека')
+                                  ],
                                 ),
-                                Container(
-                                  margin:
-                                      const EdgeInsets.only(left: 50, top: 10),
-                                  child: CustomText(
-                                    text: documentSnapshot['name'],
-                                    align: TextAlign.start,
-                                    size: 17,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              ),
+                              Container(
+                                margin:
+                                    const EdgeInsets.only(left: 50, top: 10),
+                                child: CustomText(
+                                  text: documentSnapshot['name'],
+                                  align: TextAlign.start,
+                                  size: 17,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                Container(
-                                  margin:
-                                      const EdgeInsets.only(left: 50, top: 10),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      CustomText(
+                              ),
+                              Container(
+                                margin:
+                                    const EdgeInsets.only(left: 50, top: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomText(
+                                      text:
+                                          ('${(args.days.inDays.toInt() + 1) * int.parse(documentSnapshot['price'])} ₽')
+                                              .toString(),
+                                      align: TextAlign.start,
+                                      size: 13,
+                                    ),
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    CustomText(
                                         text:
-                                            ('${(args.days.inDays.toInt() + 1) * int.parse(documentSnapshot['price'])} ₽')
-                                                .toString(),
-                                        align: TextAlign.start,
-                                        size: 13,
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      CustomText(
-                                          text:
-                                              "За ${args.days.inDays + 1} ночей и ${args.people} гостей")
-                                    ],
-                                  ),
+                                            "За ${args.days.inDays + 1} ночей и ${args.people} гостей")
+                                  ],
                                 ),
-                              ],
-                            ),
-                        
+                              ),
+                            ],
+                          ),
                         );
                       },
                     );
@@ -354,6 +365,6 @@ class _ListHotelsViewState extends State<ListHotelsView> {
               ),
             ],
           ),
-        ));
+        )));
   }
 }
