@@ -1,3 +1,4 @@
+import 'package:find_hotels_app/data/sort.dart';
 import 'package:find_hotels_app/firebase/get_hotels.dart';
 import 'package:find_hotels_app/view/list_hotels_view.dart';
 import 'package:find_hotels_app/view/main_view.dart';
@@ -25,7 +26,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => GetHotel()),
-        ChangeNotifierProvider(create: (context) => NumPersonViewModel())
+        ChangeNotifierProvider(create: (context) => NumPersonViewModel()),
+        ChangeNotifierProvider(create: (context) => Sort())
       ],
       child: MaterialApp(
         localizationsDelegates: const [

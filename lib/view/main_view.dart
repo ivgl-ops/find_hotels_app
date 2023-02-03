@@ -49,6 +49,7 @@ class _MainViewState extends State<MainView> {
   Widget build(BuildContext context) {
     final start = dateRange.start;
     final end = dateRange.end;
+    final days = dateRange.duration;
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -117,9 +118,11 @@ class _MainViewState extends State<MainView> {
                                             end,
                                             cityController.text,
                                             Provider.of<NumPersonViewModel>(
-                                                    context, listen: false)
+                                                    context,
+                                                    listen: false)
                                                 .total
-                                                .toString()));
+                                                .toString(),
+                                            days));
                                   },
                                 )),
                           ),
