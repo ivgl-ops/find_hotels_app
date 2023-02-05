@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_hotels_app/data/search_hotels.dart';
-import 'package:find_hotels_app/data/sort.dart';
 import 'package:find_hotels_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 
@@ -69,7 +68,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                   ),
                 ),
               ),
-              //TODO: сделать POPUPMENU
+             
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -95,9 +94,10 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                                           onChanged: (value) {
                                             setState(() {
                                               _selectedGender = value!;
-                                              
                                             });
-                                            context.read<GetHotel>().changeRateMin();
+                                            context
+                                                .read<GetHotel>()
+                                                .changeRateMin();
                                             Navigator.pop(context);
                                           },
                                         ),
@@ -112,7 +112,9 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                                             setState(() {
                                               _selectedGender = value!;
                                             });
-                                            context.read<GetHotel>().changeRateMax();
+                                            context
+                                                .read<GetHotel>()
+                                                .changeRateMax();
                                             Navigator.pop(context);
                                           },
                                         ),
@@ -127,7 +129,9 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                                             setState(() {
                                               _selectedGender = value!;
                                             });
-                                            context.read<GetHotel>().changeRateMin();
+                                            context
+                                                .read<GetHotel>()
+                                                .changeRateMin();
                                             Navigator.pop(context);
                                           },
                                         ),
@@ -143,7 +147,9 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                                             setState(() {
                                               _selectedGender = value!;
                                             });
-                                            context.read<GetHotel>().changeRateMax();
+                                            context
+                                                .read<GetHotel>()
+                                                .changeRateMax();
                                             Navigator.pop(context);
                                           },
                                         ),
@@ -176,21 +182,26 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                       ),
                     ),
                   ),
-                  Container(
-                    width: 130,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      color: const Color(0xffE7E7E7),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: const [
-                        Icon(
-                          Icons.settings,
-                        ),
-                        CustomText(text: "Фильтр")
-                      ],
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/filter');
+                    },
+                    child: Container(
+                      width: 130,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        color: const Color(0xffE7E7E7),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: const [
+                          Icon(
+                            Icons.settings,
+                          ),
+                          CustomText(text: "Фильтр")
+                        ],
+                      ),
                     ),
                   ),
                   Container(
@@ -260,7 +271,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                       itemBuilder: (context, index) {
                         final DocumentSnapshot documentSnapshot =
                             snapshot.data!.docs[index];
-                        print(documentSnapshot['name']);
+                        
                         return Container(
                           width: double.infinity,
                           height: 300,
