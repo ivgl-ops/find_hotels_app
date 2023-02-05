@@ -1,14 +1,14 @@
 import 'package:find_hotels_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 
-class FilterHotels extends StatefulWidget {
-  const FilterHotels({super.key});
+class FilterHotelsView extends StatefulWidget {
+  const FilterHotelsView({super.key});
 
   @override
-  State<FilterHotels> createState() => _FilterHotelsState();
+  State<FilterHotelsView> createState() => _FilterHotelsViewState();
 }
 
-class _FilterHotelsState extends State<FilterHotels> {
+class _FilterHotelsViewState extends State<FilterHotelsView> {
   String all = 'All';
   String bed1 = 'bed1';
   String bed2 = 'bed2';
