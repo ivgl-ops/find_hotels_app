@@ -70,7 +70,6 @@ class _ApartmentViewState extends State<ApartmentView> {
             Container(
               margin: EdgeInsets.symmetric(horizontal: 25),
               width: double.infinity,
-
               decoration: BoxDecoration(
                 color: Color(0xffE7E7E7),
                 borderRadius: BorderRadius.circular(25),
@@ -129,7 +128,6 @@ class _ApartmentViewState extends State<ApartmentView> {
             Container(
               margin: EdgeInsets.symmetric(horizontal: 25),
               width: double.infinity,
-              height: 78,
               decoration: BoxDecoration(
                 color: Color(0xffE7E7E7),
                 borderRadius: BorderRadius.circular(25),
@@ -174,11 +172,48 @@ class _ApartmentViewState extends State<ApartmentView> {
                       SizedBox(
                         width: 10,
                       ),
-                      Icon(Icons.arrow_forward_ios_outlined, color: Colors.black, size: 15,)
+                      Icon(
+                        Icons.arrow_forward_ios_outlined,
+                        color: Colors.black,
+                        size: 15,
+                      )
                     ],
                   ),
-                  SizedBox(height: 10,),
+                  SizedBox(
+                    height: 15,
+                  )
                 ],
+              ),
+            ),
+            SizedBox(
+              height: 25,
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 25),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Color(0xffE7E7E7),
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: IntrinsicWidth(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      height: 20,
+                    ),
+                     Container(
+                       margin: EdgeInsets.symmetric(horizontal: 5),
+
+                       child: CustomText(
+                          text:
+                              "К услугам гостей этого отеля терраса и небольшой бассейн на крыше, открытый круглый год. Отель находится напротив ботанического сада Валенсии и торгового центра New Centro, а также располагает тренажерным залом и сауной.К услугам гостей отеля NH Valencia Center элегантно оформленные звукоизолированные номера с кондиционером, бесплатным Wi-Fi и телевизором с плоским экраном и спутниковыми каналами. В собственной ванной комнате предоставляются туалетно-косметические принадлежности.Отель NH Valencia Center находится в 5 минутах ходьбы от станции метро Túria, откуда можно легко добраться до центра Валенсии. Гостям предоставляется скидка 20% на пользование общественной парковкой, до которой можно добраться прямо из отеля."),
+                     ),
+                    SizedBox(
+                      height: 20,
+                    )
+                  ],
+                ),
               ),
             ),
           ],
