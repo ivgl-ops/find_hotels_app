@@ -17,6 +17,24 @@ class ListHotelsView extends StatefulWidget {
 
 class _ListHotelsViewState extends State<ListHotelsView> {
   String _selectedGender = 'От 10 до 0';
+  int roundPrice = 0;
+
+  void getPriceForPeople(int days, var countPeople, int price) {
+    double totalPrice;
+    double rooms;
+    if (countPeople.isEven) {
+      rooms = countPeople / 2;
+      totalPrice = days * rooms * price;
+      roundPrice = totalPrice.toInt();
+    } else {
+      rooms = countPeople / 2 + 1;
+      rooms =  double.parse(rooms.toStringAsFixed(0)) - 1;
+      totalPrice = days * rooms * price;
+      roundPrice = totalPrice.toInt();
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as SearchHotels;
@@ -68,10 +86,11 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                   ),
                 ),
               ),
-             
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  SizedBox(
+                    width: 19,
+                  ),
                   GestureDetector(
                     onTap: () {
                       showDialog(
@@ -164,30 +183,68 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                             );
                           });
                     },
-                    child: Container(
-                      width: 156,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        color: const Color(0xffE7E7E7),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: const [
-                          Icon(
-                            Icons.sort,
-                          ),
-                          CustomText(text: "Сортировать")
-                        ],
+                    child: Expanded(
+                      child: Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(25),
+                          color: const Color(0xffE7E7E7),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: const [
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Icon(
+                              Icons.sort,
+                            ),
+                            CustomText(text: "Сортировать"),
+                            SizedBox(
+                              width: 10,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
+                  ),
+                  SizedBox(
+                    width: 10,
                   ),
                   GestureDetector(
                     onTap: () {
                       Navigator.pushNamed(context, '/filter');
                     },
+                    child: Expanded(
+                      child: Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(25),
+                          color: const Color(0xffE7E7E7),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: const [
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Icon(
+                              Icons.settings,
+                            ),
+                            CustomText(text: "Фильтр"),
+                            SizedBox(
+                              width: 10,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
                     child: Container(
-                      width: 130,
                       height: 50,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(25),
@@ -196,34 +253,25 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: const [
-                          Icon(
-                            Icons.settings,
+                          SizedBox(
+                            width: 10,
                           ),
-                          CustomText(text: "Фильтр")
+                          Icon(
+                            Icons.map,
+                          ),
+                          CustomText(text: "Карта"),
+                          SizedBox(
+                            width: 10,
+                          ),
                         ],
                       ),
                     ),
                   ),
-                  Container(
-                    width: 130,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      color: const Color(0xffE7E7E7),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: const [
-                        Icon(
-                          Icons.map,
-                        ),
-                        CustomText(text: "Карта")
-                      ],
-                    ),
+                  SizedBox(
+                    width: 20,
                   ),
                 ],
               ),
-
               StreamBuilder(
                 stream: place.snapshots(),
                 builder: (BuildContext context,
@@ -271,12 +319,22 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                       itemBuilder: (context, index) {
                         final DocumentSnapshot documentSnapshot =
                             snapshot.data!.docs[index];
-                        
+
+                        getPriceForPeople(
+                          args.days.inDays.toInt() + 1,
+                          int.parse(args.people),
+                          int.parse(
+                            documentSnapshot['price'],
+                          ),
+                        );
+
+
+
                         return Container(
                           width: double.infinity,
                           height: 300,
                           margin: const EdgeInsets.only(
-                              left: 40, top: 20, right: 40),
+                              left: 35, top: 20, right: 25),
                           decoration: const BoxDecoration(
                               color: Color(0xffE7E7E7),
                               borderRadius:
@@ -288,9 +346,9 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                                 child: Stack(
                                   children: [
                                     Container(
-                                      margin: const EdgeInsets.only(top: 15),
+                                      margin: const EdgeInsets.only(top: 20),
                                       height: 150,
-                                      width: 320,
+                                      width: 250,
                                       child: ClipRRect(
                                         borderRadius:
                                             BorderRadius.circular(25.0),
@@ -336,7 +394,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                               ),
                               Container(
                                 margin:
-                                    const EdgeInsets.only(left: 50, top: 10),
+                                    const EdgeInsets.only(left: 35, top: 10),
                                 child: CustomText(
                                   text: documentSnapshot['name'],
                                   align: TextAlign.start,
@@ -346,14 +404,12 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                               ),
                               Container(
                                 margin:
-                                    const EdgeInsets.only(left: 50, top: 10),
+                                    const EdgeInsets.only(left: 35, top: 10),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     CustomText(
-                                      text:
-                                          ('${(args.days.inDays.toInt() + 1) * int.parse(documentSnapshot['price'])} ₽')
-                                              .toString(),
+                                      text: ('$roundPrice ₽').toString(),
                                       align: TextAlign.start,
                                       size: 13,
                                     ),

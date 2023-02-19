@@ -9,25 +9,29 @@ class FilterHotelsView extends StatefulWidget {
 }
 
 class _FilterHotelsViewState extends State<FilterHotelsView> {
-  String all = 'All';
+  List<String> selectedCategoryBed = <String>[];
+  List<String> selectedCategoryFilter = <String>[];
+  List<String> selectedCategoryHotel = <String>[];
+  List<String> selectedCategoryStars = <String>[];
+
   String bed1 = 'bed1';
   String bed2 = 'bed2';
+
   String category1 = 'hotel';
   String category2 = 'hostel';
   String category3 = 'apartment';
-  List<String> selectedCategoryBed = <String>[];
-  List<String> selectedCategoryHotel = <String>[];
-  List<String> selectedCategoryStars = <String>[];
-  List<String> selectedCategoryFilter = <String>[];
+
+  String filer1 = 'filter1';
+  String filer2 = 'filter2';
+  String filer3 = 'filter3';
+  String filer4 = 'filter4';
+
   String stars1 = 'stars1';
   String stars2 = 'stars2';
   String stars3 = 'stars3';
   String stars4 = 'stars4';
   String stars5 = 'stars5';
-  String filer1 = 'filter1';
-  String filer2 = 'filter2';
-  String filer3 = 'filter3';
-  String filer4 = 'filter4';
+
   bool vertical = false;
 
   RangeValues _currentRangeValues = const RangeValues(2000, 20000);
@@ -57,7 +61,7 @@ class _FilterHotelsViewState extends State<FilterHotelsView> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              margin: const EdgeInsets.only(left: 20, top: 25,  bottom: 10),
+              margin: const EdgeInsets.only(left: 20, top: 25, bottom: 10),
               child: const CustomText(
                 text: "Ваш бюджет",
                 fontWeight: FontWeight.bold,
@@ -68,19 +72,19 @@ class _FilterHotelsViewState extends State<FilterHotelsView> {
             Container(
               margin: const EdgeInsets.symmetric(vertical: 5),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: const [
+                  SizedBox(width: 32,),
                   SizedBox(
-                    width: 200,
                     child: CustomText(text: "1500 ₽"),
                   ),
+                  Spacer(),
                   SizedBox(
-                    width: 200,
                     child: CustomText(
-                      text: "2500 ₽+",
+                      text: "25000 ₽+",
                       align: TextAlign.end,
                     ),
-                  )
+                  ),
+                  SizedBox(width: 32,),
                 ],
               ),
             ),
@@ -328,147 +332,156 @@ class _FilterHotelsViewState extends State<FilterHotelsView> {
             Column(
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
-                    InkWell(
-                      splashColor: Colors.blue[100],
-                      onTap: () {
-                        selectedCategoryStars = <String>[];
-                        selectedCategoryStars.add(stars1);
-                        setState(() {});
-                      },
-                      child: Container(
-                        width: 100,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10.0, horizontal: 12.0),
-                        decoration: BoxDecoration(
-                          color: selectedCategoryStars.contains(stars1)
-                              ? Colors.blue[100]
-                              : Colors.grey[300],
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(48.0)),
+                    SizedBox(width: 15,),
+                     Expanded(
+                       child: InkWell(
+                        splashColor: Colors.blue[100],
+                        onTap: () {
+                          selectedCategoryStars = <String>[];
+                          selectedCategoryStars.add(stars1);
+                          setState(() {});
+                        },
+                        child:  Expanded(
+                          child: Container(
+                            
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 12.0),
+                            decoration: BoxDecoration(
+                              color: selectedCategoryStars.contains(stars1)
+                                  ? Colors.blue[100]
+                                  : Colors.grey[300],
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(48.0)),
+                            ),
+                            child: const CustomText(
+                              text: "1 звезда",
+                              align: TextAlign.center,
+                            ),
+                          ),
                         ),
-                        child: const CustomText(
-                          text: "1 звезда",
-                          align: TextAlign.center,
-                        ),
-                      ),
                     ),
-                    const SizedBox(
-                      width: 2.0,
-                    ),
-                    InkWell(
-                      splashColor: Colors.blue[100],
-                      onTap: () {
-                        selectedCategoryStars = <String>[];
-                        selectedCategoryStars.add(stars2);
-                        setState(() {});
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10.0, horizontal: 12.0),
-                        decoration: BoxDecoration(
-                          color: selectedCategoryStars.contains(stars2)
-                              ? Colors.blue[100]
-                              : Colors.grey[300],
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(48.0)),
+                     ),
+                    SizedBox(width: 11,),
+                     Expanded(
+                       child: InkWell(
+                        splashColor: Colors.blue[100],
+                        onTap: () {
+                          selectedCategoryStars = <String>[];
+                          selectedCategoryStars.add(stars2);
+                          setState(() {});
+                        },
+                        child:  Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 12.0),
+                            decoration: BoxDecoration(
+                              color: selectedCategoryStars.contains(stars2)
+                                  ? Colors.blue[100]
+                                  : Colors.grey[300],
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(48.0)),
+                            ),
+                            child: const CustomText(
+                              text: "2 звезды",
+                              align: TextAlign.center,
+                            ),
+                          ),
                         ),
-                        child: const CustomText(
-                          text: "2 звезды",
-                          align: TextAlign.center,
-                        ),
-                      ),
                     ),
-                    const SizedBox(
-                      width: 2.0,
-                    ),
-                    InkWell(
-                      splashColor: Colors.blue[100],
-                      onTap: () {
-                        selectedCategoryStars = <String>[];
-                        selectedCategoryStars.add(stars3);
-                        setState(() {});
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10.0, horizontal: 12.0),
-                        decoration: BoxDecoration(
-                          color: selectedCategoryStars.contains(stars3)
-                              ? Colors.blue[100]
-                              : Colors.grey[300],
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(48.0)),
+                     ),
+                    SizedBox(width: 15,),
+                     Expanded(
+                       child: InkWell(
+                        splashColor: Colors.blue[100],
+                        onTap: () {
+                          selectedCategoryStars = <String>[];
+                          selectedCategoryStars.add(stars3);
+                          setState(() {});
+                        },
+                        child: Expanded(
+                          child: Container(
+                            
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 12.0),
+                            decoration: BoxDecoration(
+                              color: selectedCategoryStars.contains(stars3)
+                                  ? Colors.blue[100]
+                                  : Colors.grey[300],
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(48.0)),
+                            ),
+                            child: const CustomText(
+                              text: "3 звезды",
+                              align: TextAlign.center,
+                            ),
+                          ),
                         ),
-                        child: const CustomText(
-                          text: "3 звезды",
-                          align: TextAlign.center,
-                        ),
-                      ),
                     ),
+                     ),
+                    SizedBox(width: 15,),
                   ],
                 ),
                 Container(
                   margin: const EdgeInsets.only(top: 10),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+
                     children: <Widget>[
-                      const SizedBox(
-                        width: 2.0,
-                      ),
-                      InkWell(
-                        splashColor: Colors.blue[100],
-                        onTap: () {
-                          selectedCategoryStars = <String>[];
-                          selectedCategoryStars.add(stars4);
-                          setState(() {});
-                        },
-                        child: Container(
-                          width: 100,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10.0, horizontal: 12.0),
-                          decoration: BoxDecoration(
-                            color: selectedCategoryStars.contains(stars4)
-                                ? Colors.blue[100]
-                                : Colors.grey[300],
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(48.0)),
-                          ),
-                          child: const CustomText(
-                            text: "4 звезды",
-                            align: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 2.0,
-                      ),
-                      InkWell(
-                        splashColor: Colors.blue[100],
-                        onTap: () {
-                          selectedCategoryStars = <String>[];
-                          selectedCategoryStars.add(stars5);
-                          setState(() {});
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10.0, horizontal: 12.0),
-                          decoration: BoxDecoration(
-                            color: selectedCategoryStars.contains(stars5)
-                                ? Colors.blue[100]
-                                : Colors.grey[300],
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(48.0)),
-                          ),
-                          child: const CustomText(
-                            text: "5 звезды",
-                            align: TextAlign.center,
+                      SizedBox(width: 15,),
+                      Expanded(
+                        child: InkWell(
+                          splashColor: Colors.blue[100],
+                          onTap: () {
+                            selectedCategoryStars = <String>[];
+                            selectedCategoryStars.add(stars4);
+                            setState(() {});
+                          },
+                          child: Container(
+                            width: 100,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 12.0),
+                            decoration: BoxDecoration(
+                              color: selectedCategoryStars.contains(stars4)
+                                  ? Colors.blue[100]
+                                  : Colors.grey[300],
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(48.0)),
+                            ),
+                            child: const CustomText(
+                              text: "4 звезды",
+                              align: TextAlign.center,
+                            ),
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        width: 2.0,
+                      SizedBox(width: 15,),
+                       Expanded(
+                         child: InkWell(
+                          splashColor: Colors.blue[100],
+                          onTap: () {
+                            selectedCategoryStars = <String>[];
+                            selectedCategoryStars.add(stars5);
+                            setState(() {});
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 12.0),
+                            decoration: BoxDecoration(
+                              color: selectedCategoryStars.contains(stars5)
+                                  ? Colors.blue[100]
+                                  : Colors.grey[300],
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(48.0)),
+                            ),
+                            child: const CustomText(
+                              text: "5 звезды",
+                              align: TextAlign.center,
+                            ),
+                          ),
                       ),
+                       ),
+                      SizedBox(width: 33,),
+                      Spacer()
                     ],
                   ),
                 ),

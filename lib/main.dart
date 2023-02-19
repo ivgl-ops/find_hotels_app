@@ -31,16 +31,20 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => Sort())
       ],
       child: MaterialApp(
+        theme: ThemeData(
+          brightness: Brightness.light,
+          primaryColor: Colors.lightBlueAccent,
+        ),
+
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
         ],
-        supportedLocales: const [Locale('ru'), Locale('fr')],
+        supportedLocales: const [
+          Locale('ru'),
+        ],
         title: 'Flutter Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
         routes: {
           '/num': (context) => const NumPersonView(),
           '/main': (context) => const MainView(),

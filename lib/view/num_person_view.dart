@@ -20,7 +20,8 @@ class _NumPersonViewState extends State<NumPersonView> {
     int counterHotelRoom =
         Provider.of<NumPersonViewModel>(context).counterHotelRoom;
     return Scaffold(
-      body: SizedBox(
+      body: Container(
+        color: Color(0xff007AFF),
         width: double.infinity,
         height: double.infinity,
         child: Column(
@@ -56,12 +57,13 @@ class _NumPersonViewState extends State<NumPersonView> {
                   Container(
                     margin: const EdgeInsets.only(top: 40),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
+                        SizedBox(width: 31,),
                         const CustomText(
                           text: "Взрослые",
                           size: 25,
                         ),
+                        Spacer(),
                         IconButton(
                           onPressed: () {
                             context
@@ -73,10 +75,15 @@ class _NumPersonViewState extends State<NumPersonView> {
                             size: 30,
                           ),
                         ),
-                        CustomText(
-                          text: counterAdults.toString(),
-                          size: 30,
+    
+                        Expanded(
+                          child: CustomText(
+                            align: TextAlign.center,
+                            text: counterAdults.toString(),
+                            size: 30,
+                          ),
                         ),
+
                         IconButton(
                           onPressed: () {
                             setState(() {
@@ -89,35 +96,43 @@ class _NumPersonViewState extends State<NumPersonView> {
                             Icons.add_circle_outline,
                             size: 30,
                           ),
-                        )
+                        ),
+                        SizedBox(width: 31,),
                       ],
                     ),
                   ),
                   //ROW CHOOSE CHILDREN
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      const CustomText(
-                        text: "Дети",
-                        size: 25,
+                      SizedBox(
+                        width: 31,
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(left: 61),
-                        child: IconButton(
-                          onPressed: () {
-                            context
-                                .read<NumPersonViewModel>()
-                                .decrementCounterChildren();
-                          },
-                          icon: const Icon(
-                            Icons.remove_circle_outline,
-                            size: 30,
-                          ),
+                      Expanded(
+                        child: CustomText(
+                          text: "Дети",
+                          size: 25,
                         ),
                       ),
-                      CustomText(
-                        text: counterChildren.toString(),
-                        size: 30,
+                      Spacer(),
+                      IconButton(
+                        onPressed: () {
+                          context
+                              .read<NumPersonViewModel>()
+                              .decrementCounterChildren();
+                        },
+                        icon: const Icon(
+                          Icons.remove_circle_outline,
+                          size: 30,
+                        ),
+                      ),
+
+                      SizedBox(
+                        width: 52,
+                        child: CustomText(
+                          align: TextAlign.center,
+                          text: counterChildren.toString(),
+                          size: 30,
+                        ),
                       ),
                       IconButton(
                         onPressed: () {
@@ -131,6 +146,9 @@ class _NumPersonViewState extends State<NumPersonView> {
                           Icons.add_circle_outline,
                           size: 30,
                         ),
+                      ),
+                      SizedBox(
+                        width: 31,
                       )
                     ],
                   ),
@@ -138,30 +156,35 @@ class _NumPersonViewState extends State<NumPersonView> {
                   Container(
                     margin: const EdgeInsets.only(bottom: 40),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
+                        SizedBox(
+                          width: 31,
+                        ),
                         const CustomText(
                           text: "Номера",
                           size: 25,
                         ),
-                        Container(
-                          margin: const EdgeInsets.only(left: 19),
-                          child: IconButton(
-                            onPressed: () {
-                              context
-                                  .read<NumPersonViewModel>()
-                                  .decrementCounterHotelRoom();
-                            },
-                            icon: const Icon(
-                              Icons.remove_circle_outline,
-                              size: 30,
-                            ),
+                        Spacer(),
+                        IconButton(
+                          onPressed: () {
+                            context
+                                .read<NumPersonViewModel>()
+                                .decrementCounterHotelRoom();
+                          },
+                          icon: const Icon(
+                            Icons.remove_circle_outline,
+                            size: 30,
                           ),
                         ),
-                        CustomText(
-                          text: counterHotelRoom.toString(),
-                          size: 30,
+                        SizedBox(
+                          width: 52,
+                          child: CustomText(
+                            align: TextAlign.center,
+                            text: counterHotelRoom.toString(),
+                            size: 30,
+                          ),
                         ),
+
                         IconButton(
                           onPressed: () {
                             setState(() {
@@ -174,6 +197,9 @@ class _NumPersonViewState extends State<NumPersonView> {
                             Icons.add_circle_outline,
                             size: 30,
                           ),
+                        ),
+                        SizedBox(
+                          width: 31,
                         )
                       ],
                     ),
@@ -199,7 +225,7 @@ class _NumPersonViewState extends State<NumPersonView> {
                         ),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             )
