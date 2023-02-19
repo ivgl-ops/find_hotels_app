@@ -1,5 +1,6 @@
 import 'package:find_hotels_app/data/sort.dart';
 import 'package:find_hotels_app/firebase/get_hotels.dart';
+import 'package:find_hotels_app/view/apartmets_view.dart';
 import 'package:find_hotels_app/view/filter_hotels_view.dart';
 import 'package:find_hotels_app/view/list_hotels_view.dart';
 import 'package:find_hotels_app/view/main_view.dart';
@@ -35,7 +36,6 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.light,
           primaryColor: Colors.lightBlueAccent,
         ),
-
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
@@ -49,7 +49,8 @@ class MyApp extends StatelessWidget {
           '/num': (context) => const NumPersonView(),
           '/main': (context) => const MainView(),
           '/search': ((context) => const ListHotelsView()),
-          '/filter': ((context) => const FilterHotelsView())
+          '/filter': ((context) => const FilterHotelsView()),
+          '/apartment': ((context) => ApartmentView()),
         },
         home: const MainView(),
       ),

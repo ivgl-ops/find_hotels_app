@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:find_hotels_app/data/apartmentsData.dart';
 import 'package:find_hotels_app/data/search_hotels.dart';
 import 'package:find_hotels_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class ListHotelsView extends StatefulWidget {
 class _ListHotelsViewState extends State<ListHotelsView> {
   String _selectedGender = 'От 10 до 0';
   int roundPrice = 0;
+  List<int> priceList = [];
 
   void getPriceForPeople(int days, var countPeople, int price) {
     double totalPrice;
@@ -26,13 +28,14 @@ class _ListHotelsViewState extends State<ListHotelsView> {
       rooms = countPeople / 2;
       totalPrice = days * rooms * price;
       roundPrice = totalPrice.toInt();
+      priceList.add(roundPrice);
     } else {
       rooms = countPeople / 2 + 1;
-      rooms =  double.parse(rooms.toStringAsFixed(0)) - 1;
+      rooms = double.parse(rooms.toStringAsFixed(0)) - 1;
       totalPrice = days * rooms * price;
       roundPrice = totalPrice.toInt();
+      priceList.add(roundPrice);
     }
-
   }
 
   @override
@@ -327,102 +330,107 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                             documentSnapshot['price'],
                           ),
                         );
-
-
-
-                        return Container(
-                          width: double.infinity,
-                          height: 300,
-                          margin: const EdgeInsets.only(
-                              left: 35, top: 20, right: 25),
-                          decoration: const BoxDecoration(
-                              color: Color(0xffE7E7E7),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20))),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Center(
-                                child: Stack(
-                                  children: [
-                                    Container(
-                                      margin: const EdgeInsets.only(top: 20),
-                                      height: 150,
-                                      width: 250,
-                                      child: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(25.0),
-                                        child: Image.network(
-                                          documentSnapshot['img'],
-                                          fit: BoxFit.cover,
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/apartment',
+                                arguments: ApartmentData(
+                                    documentSnapshot, priceList[index], args.people, args.days));
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            height: 300,
+                            margin: const EdgeInsets.only(
+                                left: 35, top: 20, right: 25),
+                            decoration: const BoxDecoration(
+                                color: Color(0xffE7E7E7),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Center(
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        margin: const EdgeInsets.only(top: 20),
+                                        height: 150,
+                                        width: 250,
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(25.0),
+                                          child: Image.network(
+                                            documentSnapshot['img'],
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    const Positioned(
-                                        top: 25,
-                                        right: 15,
-                                        child:
-                                            Icon(Icons.favorite_border_rounded))
-                                  ],
+                                      const Positioned(
+                                          top: 25,
+                                          right: 15,
+                                          child: Icon(
+                                              Icons.favorite_border_rounded))
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.only(top: 10),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        const Icon(
-                                          Icons.people_outline,
-                                          color: Colors.blue,
-                                        ),
-                                        const SizedBox(
-                                          width: 15,
-                                        ),
-                                        CustomText(
-                                            text: documentSnapshot['rate']),
-                                      ],
-                                    ),
-                                    const CustomText(
-                                        text: '1 спальня 2 человека')
-                                  ],
+                                Container(
+                                  margin: const EdgeInsets.only(top: 10),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          const Icon(
+                                            Icons.people_outline,
+                                            color: Colors.blue,
+                                          ),
+                                          const SizedBox(
+                                            width: 15,
+                                          ),
+                                          CustomText(
+                                              text: documentSnapshot['rate']),
+                                        ],
+                                      ),
+                                      const CustomText(
+                                          text: '1 спальня 2 человека')
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                margin:
-                                    const EdgeInsets.only(left: 35, top: 10),
-                                child: CustomText(
-                                  text: documentSnapshot['name'],
-                                  align: TextAlign.start,
-                                  size: 17,
-                                  fontWeight: FontWeight.bold,
+                                Container(
+                                  margin:
+                                      const EdgeInsets.only(left: 35, top: 10),
+                                  child: CustomText(
+                                    text: documentSnapshot['name'],
+                                    align: TextAlign.start,
+                                    size: 17,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                margin:
-                                    const EdgeInsets.only(left: 35, top: 10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    CustomText(
-                                      text: ('$roundPrice ₽').toString(),
-                                      align: TextAlign.start,
-                                      size: 13,
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    CustomText(
-                                        text:
-                                            "За ${args.days.inDays + 1} ночей и ${args.people} гостей")
-                                  ],
+                                Container(
+                                  margin:
+                                      const EdgeInsets.only(left: 35, top: 10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      CustomText(
+                                        text: ('$roundPrice ₽').toString(),
+                                        align: TextAlign.start,
+                                        size: 13,
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      CustomText(
+                                          text:
+                                              "За ${args.days.inDays + 1} ночей и ${args.people} гостей")
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         );
                       },
