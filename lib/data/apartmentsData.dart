@@ -6,5 +6,5 @@ class ApartmentData {
   final String people;
   final Duration days;
 
-  ApartmentData(this.documentSnapshot, this.price, this.people, this.days);
+  ApartmentData(this.documentSnapshot, this.price, this.people, this.days, );
 }

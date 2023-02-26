@@ -21,6 +21,7 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
   DateTimeRange dateRange = DateTimeRange(
       start: DateTime.now(), end: DateTime.now().add(const Duration(days: 6)));
+
   final startYear = int.parse(DateFormat('yyyy').format(DateTime.now()));
   final startMounth = int.parse(DateFormat('M').format(DateTime.now()));
   final startDays = int.parse(DateFormat('d').format(DateTime.now()));
@@ -28,8 +29,8 @@ class _MainViewState extends State<MainView> {
 
   @override
   void dispose() {
-    cityController.dispose();
     super.dispose();
+    cityController.dispose();
   }
 
   Future pickDateRange() async {
@@ -67,73 +68,102 @@ class _MainViewState extends State<MainView> {
                 Colors.blue,
               ],
               child: Container(
-                  margin: const EdgeInsets.only(top: 70),
-                  width: double.infinity,
-                  height: 300,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(left: 70, right: 70),
-                          child: const CustomText(
-                            align: TextAlign.center,
-                            text:
-                                "Найдите лучшие предложения на отели, апартаменты\n и многое другое...",
-                            color: Colors.white,
-                            size: 23,
-                            fontWeight: FontWeight.bold,
-                          ),
+                margin: const EdgeInsets.only(top: 70),
+                width: double.infinity,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(left: 70, right: 70),
+                        child: const CustomText(
+                          align: TextAlign.center,
+                          text:
+                              "Найдите лучшие предложения на отели, апартаменты\n и многое другое...",
+                          color: Colors.white,
+                          size: 23,
+                          fontWeight: FontWeight.bold,
                         ),
-                        Container(
-                          margin: const EdgeInsets.only(
-                              top: 30, left: 30, right: 30),
-                          height: 40,
-                          child: TextField(
-                            controller: cityController,
-                            decoration: InputDecoration(
-                                filled: true,
-                                fillColor: Colors.white,
-                                contentPadding: const EdgeInsets.only(left: 15),
-                                hintText: 'Москва',
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    width: 5, //<-- SEE HERE
-                                    color: Colors.white,
-                                  ),
-                                  borderRadius: BorderRadius.circular(50.0),
+                      ),
+                      Container(
+                        margin:
+                            const EdgeInsets.only(top: 30, left: 30, right: 30),
+                        height: 40,
+                        child: TextField(
+                          controller: cityController,
+                          decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.white,
+                              contentPadding: const EdgeInsets.only(left: 15),
+                              hintText: 'Москва',
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  width: 5, //<-- SEE HERE
+                                  color: Colors.white,
                                 ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    width: 5, //<-- SEE HERE
-                                    color: Colors.white,
-                                  ),
-                                  borderRadius: BorderRadius.circular(50.0),
+                                borderRadius: BorderRadius.circular(50.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  width: 5, //<-- SEE HERE
+                                  color: Colors.white,
                                 ),
-                                suffixIcon: IconButton(
-                                  icon: const Icon(Icons.search),
-                                  onPressed: () {
-                                    Navigator.pushNamed(context, '/search',
-                                        arguments: SearchHotels(
-                                            start,
-                                            end,
-                                            cityController.text,
-                                            Provider.of<NumPersonViewModel>(
-                                                    context,
-                                                    listen: false)
-                                                .total
-                                                .toString(),
-                                            days));
+                                borderRadius: BorderRadius.circular(50.0),
+                              ),
+                              suffixIcon: IconButton(
+                                icon: const Icon(Icons.search),
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/search',
+                                      arguments: SearchHotels(
+                                          start,
+                                          end,
+                                          cityController.text,
+                                          Provider.of<NumPersonViewModel>(
+                                                  context,
+                                                  listen: false)
+                                              .total
+                                              .toString(),
+                                          days));
+                                },
+                              )),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.only(right: 15),
+                            height: 40,
+                            margin: const EdgeInsets.only(left: 30, top: 20),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(50)),
+                            child: Row(
+                              children: [
+                                Container(
+                                    margin: const EdgeInsets.only(
+                                        left: 10, right: 14),
+                                    child: const Icon(Icons.calendar_today)),
+                                GestureDetector(
+                                  onTap: () {
+                                    pickDateRange();
                                   },
-                                )),
+                                  child: CustomText(
+                                    text:
+                                        "с ${DateFormat('MM/dd').format(start)} до ${DateFormat('MM/dd').format(end)} ",
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/num');
+                            },
+                            child: Container(
                               padding: const EdgeInsets.only(right: 15),
                               height: 40,
-                              margin: const EdgeInsets.only(left: 30, top: 20),
+                              margin: const EdgeInsets.only(top: 20, right: 30),
                               decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(50)),
@@ -142,57 +172,30 @@ class _MainViewState extends State<MainView> {
                                   Container(
                                       margin: const EdgeInsets.only(
                                           left: 10, right: 14),
-                                      child: const Icon(Icons.calendar_today)),
-                                  GestureDetector(
-                                    onTap: () {
-                                      pickDateRange();
-                                    },
-                                    child: CustomText(
-                                      text:
-                                          "с ${DateFormat('MM/dd').format(start)} до ${DateFormat('MM/dd').format(end)} ",
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                      child: const Icon(
+                                        Icons.person,
+                                        size: 28,
+                                      )),
+                                  CustomText(
+                                    text:
+                                        Provider.of<NumPersonViewModel>(context)
+                                            .total
+                                            .toString(),
+                                    fontWeight: FontWeight.bold,
                                   )
                                 ],
                               ),
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(context, '/num');
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.only(right: 15),
-                                height: 40,
-                                margin:
-                                    const EdgeInsets.only(top: 20, right: 30),
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(50)),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                        margin: const EdgeInsets.only(
-                                            left: 10, right: 14),
-                                        child: const Icon(
-                                          Icons.person,
-                                          size: 28,
-                                        )),
-                                    CustomText(
-                                      text: Provider.of<NumPersonViewModel>(
-                                              context)
-                                          .total
-                                          .toString(),
-                                      fontWeight: FontWeight.bold,
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  )),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 25,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
             Container(
               margin: const EdgeInsets.only(left: 20, top: 15),
@@ -200,7 +203,7 @@ class _MainViewState extends State<MainView> {
                 text: "Популярные направления",
                 fontWeight: FontWeight.bold,
                 size: 25,
-                align: TextAlign.end,
+                align: TextAlign.start,
               ),
             ),
             StreamBuilder(

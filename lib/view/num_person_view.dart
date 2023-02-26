@@ -76,7 +76,8 @@ class _NumPersonViewState extends State<NumPersonView> {
                           ),
                         ),
     
-                        Expanded(
+                        SizedBox(
+                          width: 52,
                           child: CustomText(
                             align: TextAlign.center,
                             text: counterAdults.toString(),

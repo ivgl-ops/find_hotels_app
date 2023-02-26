@@ -92,7 +92,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
               Row(
                 children: [
                   SizedBox(
-                    width: 19,
+                    width: 20,
                   ),
                   GestureDetector(
                     onTap: () {
@@ -186,39 +186,42 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                             );
                           });
                     },
-                    child: Expanded(
-                      child: Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(25),
-                          color: const Color(0xffE7E7E7),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: const [
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Icon(
-                              Icons.sort,
-                            ),
-                            CustomText(text: "Сортировать"),
-                            SizedBox(
-                              width: 10,
-                            ),
-                          ],
-                        ),
+                    child: Container(
+                      height: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        color: const Color(0xffE7E7E7),
+                      ),
+                      child: Row(
+                        children: const [
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Icon(
+                            Icons.sort,
+                          ),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          CustomText(
+                            text: "Сортировать",
+                            size: 10,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                        ],
                       ),
                     ),
                   ),
                   SizedBox(
                     width: 10,
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/filter');
-                    },
-                    child: Expanded(
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/filter');
+                      },
                       child: Container(
                         height: 50,
                         decoration: BoxDecoration(
@@ -226,15 +229,23 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                           color: const Color(0xffE7E7E7),
                         ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
                             SizedBox(
                               width: 10,
                             ),
                             Icon(
                               Icons.settings,
+                              size: 15,
                             ),
-                            CustomText(text: "Фильтр"),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            CustomText(
+                              text: "Фильтр",
+                              size: 10,
+                            ),
                             SizedBox(
                               width: 10,
                             ),
@@ -247,26 +258,38 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                     width: 10,
                   ),
                   Expanded(
-                    child: Container(
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25),
-                        color: const Color(0xffE7E7E7),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: const [
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Icon(
-                            Icons.map,
-                          ),
-                          CustomText(text: "Карта"),
-                          SizedBox(
-                            width: 10,
-                          ),
-                        ],
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/filter');
+                      },
+                      child: Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(25),
+                          color: const Color(0xffE7E7E7),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Icon(
+                              Icons.map_outlined,
+                              size: 15,
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            CustomText(
+                              text: "Карта",
+                              size: 10,
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -314,6 +337,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                       ),
                     );
                   } else {
+
                     return ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(10),
@@ -322,7 +346,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                       itemBuilder: (context, index) {
                         final DocumentSnapshot documentSnapshot =
                             snapshot.data!.docs[index];
-
+                        final bool favotiteHotel = documentSnapshot['like'];
                         getPriceForPeople(
                           args.days.inDays.toInt() + 1,
                           int.parse(args.people),
@@ -334,7 +358,11 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                           onTap: () {
                             Navigator.pushNamed(context, '/apartment',
                                 arguments: ApartmentData(
-                                    documentSnapshot, priceList[index], args.people, args.days));
+                                  documentSnapshot,
+                                  priceList[index],
+                                  args.people,
+                                  args.days,
+                                ));
                           },
                           child: Container(
                             width: double.infinity,
@@ -364,43 +392,47 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                                           ),
                                         ),
                                       ),
-                                      const Positioned(
+                                      Positioned(
                                           top: 25,
                                           right: 15,
-                                          child: Icon(
-                                              Icons.favorite_border_rounded))
+                                          child: favotiteHotel
+                                              ? Icon(
+                                                  Icons.favorite,
+                                                  color: Colors.red,
+                                                )
+                                              : Icon(Icons
+                                                  .favorite_border_outlined))
                                     ],
                                   ),
                                 ),
                                 Container(
                                   margin: const EdgeInsets.only(top: 10),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          const Icon(
-                                            Icons.people_outline,
-                                            color: Colors.blue,
-                                          ),
-                                          const SizedBox(
-                                            width: 15,
-                                          ),
-                                          CustomText(
-                                              text: documentSnapshot['rate']),
-                                        ],
+                                      SizedBox(
+                                        width: 15,
                                       ),
+                                      const Icon(
+                                        Icons.people_outline,
+                                        color: Colors.blue,
+                                      ),
+                                      const SizedBox(
+                                        width: 15,
+                                      ),
+                                      CustomText(
+                                          text: documentSnapshot['rate']),
+                                      Spacer(),
                                       const CustomText(
-                                          text: '1 спальня 2 человека')
+                                          text: '1 спальня 2 человека'),
+                                      SizedBox(
+                                        width: 15,
+                                      )
                                     ],
                                   ),
                                 ),
                                 Container(
                                   margin:
-                                      const EdgeInsets.only(left: 35, top: 10),
+                                      const EdgeInsets.only(left: 15, top: 10),
                                   child: CustomText(
                                     text: documentSnapshot['name'],
                                     align: TextAlign.start,
@@ -410,7 +442,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                                 ),
                                 Container(
                                   margin:
-                                      const EdgeInsets.only(left: 35, top: 10),
+                                      const EdgeInsets.only(left: 15, top: 10),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,

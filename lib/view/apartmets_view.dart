@@ -1,5 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_hotels_app/data/apartmentsData.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/custom_text.dart';
@@ -12,9 +12,54 @@ class ApartmentView extends StatefulWidget {
 }
 
 class _ApartmentViewState extends State<ApartmentView> {
+  bool? fav;
+  late final args;
+  late String docId;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      final args = ModalRoute.of(context)!.settings.arguments as ApartmentData;
+      fav = args.documentSnapshot['like'];
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    CollectionReference table = FirebaseFirestore.instance.collection('москва');
+
+    CollectionReference favorite =
+        FirebaseFirestore.instance.collection('favorite');
+
     final args = ModalRoute.of(context)!.settings.arguments as ApartmentData;
+
+    print("dfsdf ${args.documentSnapshot['edit']}");
+    void updateStatusFav() async {
+      if (fav!) {
+        await table.doc(args.documentSnapshot.id).update({"like": false});
+        fav = false;
+        if (args.documentSnapshot['edit'] == true) {
+          favorite.doc(args.documentSnapshot.id).delete();
+          Navigator.pop(context);
+        }
+      } else {
+        await table.doc(args.documentSnapshot.id).update({"like": true});
+        favorite.add({
+          'img': args.documentSnapshot['img'],
+          'like': true,
+          'name': args.documentSnapshot['name'],
+          'price': args.documentSnapshot['price'],
+          'rate': args.documentSnapshot['rate'],
+          'edit': true
+        }).then((DocumentReference doc) {
+          docId = doc.id;
+        });
+        fav = true;
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
@@ -53,12 +98,33 @@ class _ApartmentViewState extends State<ApartmentView> {
               height: 12,
             ),
             Row(
-              children: const [
+              children: [
                 SizedBox(
                   width: 1,
                 ),
                 Spacer(),
-                Icon(Icons.favorite_border_rounded),
+                if (fav ?? args.documentSnapshot['like']) ...[
+                  IconButton(
+                    onPressed: () {
+                      updateStatusFav();
+                      fav = false;
+                      setState(() {});
+                    },
+                    icon: Icon(
+                      Icons.favorite,
+                      color: Colors.red,
+                    ),
+                  ),
+                ] else ...[
+                  IconButton(
+                    onPressed: () {
+                      updateStatusFav();
+                      fav = true;
+                      setState(() {});
+                    },
+                    icon: Icon(Icons.favorite_border_outlined),
+                  ),
+                ],
                 SizedBox(
                   width: 28,
                 ),
@@ -202,13 +268,12 @@ class _ApartmentViewState extends State<ApartmentView> {
                     SizedBox(
                       height: 20,
                     ),
-                     Container(
-                       margin: EdgeInsets.symmetric(horizontal: 5),
-
-                       child: CustomText(
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 5),
+                      child: CustomText(
                           text:
                               "К услугам гостей этого отеля терраса и небольшой бассейн на крыше, открытый круглый год. Отель находится напротив ботанического сада Валенсии и торгового центра New Centro, а также располагает тренажерным залом и сауной.К услугам гостей отеля NH Valencia Center элегантно оформленные звукоизолированные номера с кондиционером, бесплатным Wi-Fi и телевизором с плоским экраном и спутниковыми каналами. В собственной ванной комнате предоставляются туалетно-косметические принадлежности.Отель NH Valencia Center находится в 5 минутах ходьбы от станции метро Túria, откуда можно легко добраться до центра Валенсии. Гостям предоставляется скидка 20% на пользование общественной парковкой, до которой можно добраться прямо из отеля."),
-                     ),
+                    ),
                     SizedBox(
                       height: 20,
                     )
