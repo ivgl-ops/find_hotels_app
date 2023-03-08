@@ -118,6 +118,7 @@ class _MainViewState extends State<MainView> {
                               suffixIcon: IconButton(
                                 icon: const Icon(Icons.search),
                                 onPressed: () {
+                                  FocusScope.of(context).unfocus();
                                   Navigator.pushNamed(context, '/search',
                                       arguments: SearchHotels(
                                           start,

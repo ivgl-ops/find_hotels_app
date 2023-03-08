@@ -78,10 +78,8 @@ class _ApartmentViewState extends State<ApartmentView> {
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference table = FirebaseFirestore.instance.collection('москва');
 
-    CollectionReference favorite =
-        FirebaseFirestore.instance.collection('favorite');
+
 
     final args =
         ModalRoute.of(context)!.settings.arguments as ApartmentDataView;
@@ -145,7 +143,6 @@ class _ApartmentViewState extends State<ApartmentView> {
                     : IconButton(
                         onPressed: () async {
                           onFavoriteButtonPressed(list['id'], list['like']);
-
                           fav = true;
                           setState(() {});
                         },
