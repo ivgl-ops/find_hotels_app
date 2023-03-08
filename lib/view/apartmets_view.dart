@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_hotels_app/data/apartmentsData.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/custom_text.dart';
@@ -14,16 +15,65 @@ class ApartmentView extends StatefulWidget {
 class _ApartmentViewState extends State<ApartmentView> {
   bool? fav;
   late final args;
-  late String docId;
+  Map<String, dynamic> list = {};
 
   @override
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-      final args = ModalRoute.of(context)!.settings.arguments as ApartmentData;
-      fav = args.documentSnapshot['like'];
+      var args = ModalRoute.of(context)!.settings.arguments;
+      if (args != null) {
+        args = args as ApartmentDataView;
+        fav = args.searchResult['like'];
+        list = args.searchResult;
+      }
       setState(() {});
     });
+  }
+
+  void searchfromFirebase(String query) async {
+    try {
+      final documentSnapshot = await FirebaseFirestore.instance
+          .collection('москва')
+          .doc(args.searchResult['id'])
+          .get();
+      if (documentSnapshot.exists) {
+        final data = documentSnapshot.data();
+        print('Data for document ${args.searchResult['id']}: $data');
+      } else {
+        print('Document with ID ${args.searchResult['id']} does not exist');
+      }
+    } catch (error) {
+      print('Error getting document: $error');
+    }
+    setState(() {});
+  }
+
+  Future<void> updateFavoriteField(String documentId, bool newValue) async {
+    try {
+      // Get a reference to the document to update
+      final documentReference =
+          FirebaseFirestore.instance.collection('москва').doc(documentId);
+
+      // Update the 'favorite' field
+      await documentReference.update({'like': newValue});
+
+      print('Favorite field updated successfully!');
+    } catch (error) {
+      print('Error updating favorite field: $error');
+    }
+  }
+
+  void onFavoriteButtonPressed(String documentId, bool currentValue) async {
+    // Calculate the new value for the 'favorite' field
+    final newValue = !currentValue;
+
+    // Update the 'favorite' field in Firebase
+    updateFavoriteField(documentId, newValue);
+
+    // Reload the data from Firebase
+    searchfromFirebase("");
+    setState(() {});
   }
 
   @override
@@ -33,32 +83,8 @@ class _ApartmentViewState extends State<ApartmentView> {
     CollectionReference favorite =
         FirebaseFirestore.instance.collection('favorite');
 
-    final args = ModalRoute.of(context)!.settings.arguments as ApartmentData;
-
-    print("dfsdf ${args.documentSnapshot['edit']}");
-    void updateStatusFav() async {
-      if (fav!) {
-        await table.doc(args.documentSnapshot.id).update({"like": false});
-        fav = false;
-        if (args.documentSnapshot['edit'] == true) {
-          favorite.doc(args.documentSnapshot.id).delete();
-          Navigator.pop(context);
-        }
-      } else {
-        await table.doc(args.documentSnapshot.id).update({"like": true});
-        favorite.add({
-          'img': args.documentSnapshot['img'],
-          'like': true,
-          'name': args.documentSnapshot['name'],
-          'price': args.documentSnapshot['price'],
-          'rate': args.documentSnapshot['rate'],
-          'edit': true
-        }).then((DocumentReference doc) {
-          docId = doc.id;
-        });
-        fav = true;
-      }
-    }
+    final args =
+        ModalRoute.of(context)!.settings.arguments as ApartmentDataView;
 
     return Scaffold(
       appBar: AppBar(
@@ -89,10 +115,12 @@ class _ApartmentViewState extends State<ApartmentView> {
             SizedBox(
               width: double.infinity,
               height: 240,
-              child: Image.network(
-                args.documentSnapshot["img"],
-                fit: BoxFit.fill,
-              ),
+              child: list['img'] != null
+                  ? Image.network(
+                      list['img'],
+                      fit: BoxFit.fill,
+                    )
+                  : Container(),
             ),
             SizedBox(
               height: 12,
@@ -103,28 +131,25 @@ class _ApartmentViewState extends State<ApartmentView> {
                   width: 1,
                 ),
                 Spacer(),
-                if (fav ?? args.documentSnapshot['like']) ...[
-                  IconButton(
-                    onPressed: () {
-                      updateStatusFav();
-                      fav = false;
-                      setState(() {});
-                    },
-                    icon: Icon(
-                      Icons.favorite,
-                      color: Colors.red,
-                    ),
-                  ),
-                ] else ...[
-                  IconButton(
-                    onPressed: () {
-                      updateStatusFav();
-                      fav = true;
-                      setState(() {});
-                    },
-                    icon: Icon(Icons.favorite_border_outlined),
-                  ),
-                ],
+                fav == true
+                    ? IconButton(
+                        onPressed: () async {
+                          onFavoriteButtonPressed(list['id'], list['like']);
+                          fav = false;
+                          setState(() {});
+                        },
+                        icon: Icon(
+                          Icons.favorite_border_outlined,
+                          color: Colors.red,
+                        ))
+                    : IconButton(
+                        onPressed: () async {
+                          onFavoriteButtonPressed(list['id'], list['like']);
+
+                          fav = true;
+                          setState(() {});
+                        },
+                        icon: Icon(Icons.favorite_border_outlined)),
                 SizedBox(
                   width: 28,
                 ),
@@ -152,7 +177,7 @@ class _ApartmentViewState extends State<ApartmentView> {
                         width: 15,
                       ),
                       CustomText(
-                        text: args.documentSnapshot['name'],
+                        text: list['name'] ?? '',
                         fontWeight: FontWeight.bold,
                         size: 14,
                       ),
@@ -217,7 +242,7 @@ class _ApartmentViewState extends State<ApartmentView> {
                         width: 7,
                       ),
                       CustomText(
-                        text: args.documentSnapshot['rate'],
+                        text: list['rate'].toString(),
                         fontWeight: FontWeight.w600,
                       )
                     ],

@@ -20,6 +20,25 @@ class _ListHotelsViewState extends State<ListHotelsView> {
   String _selectedGender = 'От 10 до 0';
   int roundPrice = 0;
   List<int> priceList = [];
+  List searchResult = [];
+  String documentId = '';
+
+  void searchfromFirebase(String query) async {
+    final result = await FirebaseFirestore.instance
+        .collection('москва')
+        .where('city', isEqualTo: 'msk')
+        .get();
+
+    setState(() {
+      searchResult = result.docs
+          .map((doc) => {
+        'id': doc.id,
+        ...doc.data(),
+      })
+          .toList();
+    });
+  }
+
 
   void getPriceForPeople(int days, var countPeople, int price) {
     double totalPrice;
@@ -302,6 +321,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                 stream: place.snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
+                  searchfromFirebase('москва');
                   if (!snapshot.hasData) {
                     return const Center(
                       child: CircularProgressIndicator(),
@@ -337,28 +357,29 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                       ),
                     );
                   } else {
-
                     return ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(10),
-                      itemCount: snapshot.data!.docs.length,
+                      itemCount: searchResult.length,
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
                         final DocumentSnapshot documentSnapshot =
                             snapshot.data!.docs[index];
-                        final bool favotiteHotel = documentSnapshot['like'];
+                        final bool favotiteHotel = searchResult[index]['like'];
                         getPriceForPeople(
                           args.days.inDays.toInt() + 1,
                           int.parse(args.people),
                           int.parse(
-                            documentSnapshot['price'],
+                            searchResult[index]['price'],
                           ),
                         );
+                        //TODO: Переделать прием аргументов. Так как выводятся не правильно карточки
                         return GestureDetector(
                           onTap: () {
+
                             Navigator.pushNamed(context, '/apartment',
-                                arguments: ApartmentData(
-                                  documentSnapshot,
+                                arguments: ApartmentDataView(
+                                  searchResult[index],
                                   priceList[index],
                                   args.people,
                                   args.days,
@@ -387,7 +408,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                                           borderRadius:
                                               BorderRadius.circular(25.0),
                                           child: Image.network(
-                                            documentSnapshot['img'],
+                                            searchResult[index]['img'],
                                             fit: BoxFit.cover,
                                           ),
                                         ),
@@ -420,7 +441,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                                         width: 15,
                                       ),
                                       CustomText(
-                                          text: documentSnapshot['rate']),
+                                          text: searchResult[index]['rate']),
                                       Spacer(),
                                       const CustomText(
                                           text: '1 спальня 2 человека'),
@@ -434,7 +455,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                                   margin:
                                       const EdgeInsets.only(left: 15, top: 10),
                                   child: CustomText(
-                                    text: documentSnapshot['name'],
+                                    text: searchResult[index]['name'],
                                     align: TextAlign.start,
                                     size: 17,
                                     fontWeight: FontWeight.bold,

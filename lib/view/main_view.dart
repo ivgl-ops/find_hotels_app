@@ -46,6 +46,12 @@ class _MainViewState extends State<MainView> {
     setState(() => dateRange = newDateRange);
   }
 
+  String removeExtraCharacters(String inputString) {
+    RegExp regExp = new RegExp(r"[^a-zA-Zа-яА-Я]");
+    print('asdfasdf ${inputString.replaceAll(regExp, "")}');
+    return inputString.replaceAll(regExp, "");
+  }
+
   @override
   Widget build(BuildContext context) {
     final start = dateRange.start;
@@ -116,7 +122,8 @@ class _MainViewState extends State<MainView> {
                                       arguments: SearchHotels(
                                           start,
                                           end,
-                                          cityController.text,
+                                          removeExtraCharacters(
+                                              cityController.text),
                                           Provider.of<NumPersonViewModel>(
                                                   context,
                                                   listen: false)
