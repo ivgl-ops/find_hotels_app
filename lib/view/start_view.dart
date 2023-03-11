@@ -3,36 +3,44 @@ import 'package:flutter/material.dart';
 
 import 'favorite_hotels_view.dart';
 
-class StartView extends StatefulWidget {
-  const StartView({super.key});
+  class StartView extends StatefulWidget {
+    final int index;
 
-  @override
-  State<StartView> createState() => StartViewState();
-}
+    StartView({super.key,  required this.index});
 
-class StartViewState extends State<StartView> {
-  int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-
-  static const List<Widget> _widgetOptions = <Widget>[
-    MainView(),
-    FavoriteHotelsView(),
-    Text(
-      'Index 2: School',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 3: Settings',
-      style: optionStyle,
-    ),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    @override
+    State<StartView> createState() => StartViewState();
   }
+
+  class StartViewState extends State<StartView> {
+    int _selectedIndex = 0;
+    static const TextStyle optionStyle =
+        TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+
+    static const List<Widget> _widgetOptions = <Widget>[
+      MainView(),
+      FavoriteHotelsView(),
+      Text(
+        'Index 2: School',
+        style: optionStyle,
+      ),
+      Text(
+        'Index 3: Settings',
+        style: optionStyle,
+      ),
+    ];
+
+    void _onItemTapped(int index) {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
+    @override
+    void initState() {
+      super.initState();
+      _selectedIndex = widget.index;
+    }
+
 
   @override
   Widget build(BuildContext context) {

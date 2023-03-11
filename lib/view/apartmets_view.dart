@@ -78,9 +78,6 @@ class _ApartmentViewState extends State<ApartmentView> {
 
   @override
   Widget build(BuildContext context) {
-
-
-
     final args =
         ModalRoute.of(context)!.settings.arguments as ApartmentDataView;
 
@@ -137,7 +134,7 @@ class _ApartmentViewState extends State<ApartmentView> {
                           setState(() {});
                         },
                         icon: Icon(
-                          Icons.favorite_border_outlined,
+                          Icons.favorite_outlined,
                           color: Colors.red,
                         ))
                     : IconButton(

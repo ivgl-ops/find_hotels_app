@@ -1,6 +1,7 @@
 import 'package:find_hotels_app/data/sort.dart';
 import 'package:find_hotels_app/firebase/get_hotels.dart';
 import 'package:find_hotels_app/view/apartmets_view.dart';
+import 'package:find_hotels_app/view/favorite_hotels_view.dart';
 import 'package:find_hotels_app/view/filter_hotels_view.dart';
 import 'package:find_hotels_app/view/list_hotels_view.dart';
 import 'package:find_hotels_app/view/main_view.dart';
@@ -52,8 +53,10 @@ class MyApp extends StatelessWidget {
           '/search': ((context) => const ListHotelsView()),
           '/filter': ((context) => const FilterHotelsView()),
           '/apartment': ((context) => ApartmentView()),
+          '/favorites': ((context) => FavoriteHotelsView()),
+          '/start': ((context) => StartView(index: 2))
         },
-        home: const StartView(),
+        home: StartView(index: 0,),
       ),
     );
   }

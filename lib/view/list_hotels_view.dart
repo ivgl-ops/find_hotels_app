@@ -376,7 +376,6 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                         //TODO: Переделать прием аргументов. Так как выводятся не правильно карточки
                         return GestureDetector(
                           onTap: () {
-
                             Navigator.pushNamed(context, '/apartment',
                                 arguments: ApartmentDataView(
                                   searchResult[index],
