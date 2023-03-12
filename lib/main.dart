@@ -51,14 +51,16 @@ class MyApp extends StatelessWidget {
         routes: {
           '/num': (context) => const NumPersonView(),
           '/main': (context) => const MainView(),
-          '/search': ((context) => const ListHotelsView()),
+          '/search': ((context) =>  ListHotelsView()),
           '/filter': ((context) => const FilterHotelsView()),
           '/apartment': ((context) => ApartmentView()),
           '/favorites': ((context) => FavoriteHotelsView()),
           '/start': ((context) => StartView(index: 2)),
           '/question': ((context) => QuestionScreen())
         },
-        home: StartView(index: 0,)
+        home: StartView(
+          index: 0,
+        ),
       ),
     );
   }

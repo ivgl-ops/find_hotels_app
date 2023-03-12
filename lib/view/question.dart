@@ -10,11 +10,27 @@ class _QuestionScreenState extends State<QuestionScreen> {
   int _currentQuestionIndex = 0;
   List search = [];
 
-  void searchfromFirebase(String location, String location_type) async {
+  void searchfromFirebase(
+    String city,
+    String places,
+    String level_rooms,
+    String location_type,
+    String budget,
+
+  ) async {
+    print(city);
+    print(places);
+    print(level_rooms);
+    print(location_type);
+    print(budget);
+
     final result = await FirebaseFirestore.instance
         .collection('hotels_ru')
-        .where('location', isEqualTo: location)
+        .where('city', isEqualTo: city)
+        .where('places', isEqualTo: places)
+        .where('level_rooms', isEqualTo: level_rooms)
         .where('location_type', isEqualTo: location_type)
+        .where('budget', isEqualTo: budget)
         .get();
 
     setState(() {
@@ -25,9 +41,20 @@ class _QuestionScreenState extends State<QuestionScreen> {
               })
           .toList();
     });
+    print(search);
   }
 
   final List<Map<String, dynamic>> _questions = [
+    {
+      'question': 'В каком городе вы хотите остановиться?',
+      'options': [
+        'Москва',
+        'Санкт-Петербург',
+        'Краснодар',
+        'Красноярск',
+        'Владивосток',
+      ]
+    },
     {
       'question': 'Скольки местный отель вам нужен?',
       'options': [
@@ -56,7 +83,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
     {
       'question':
           'Хотели бы вы остановиться в отеле с видом на парк, реку или городской пейзаж?',
-      'options': ['парк', 'реку', 'городской пейзаж']
+      'options': ['Вид на парк', 'Вид на речку', 'Вид на городской пейзаж']
     },
     {
       'question': 'Какой бюджет вы рассматриваете?',
@@ -108,11 +135,10 @@ class _QuestionScreenState extends State<QuestionScreen> {
         _currentQuestionIndex++;
       });
     } else {
-      searchfromFirebase(_answers[3]['answer'], _answers[2]['answer']);
-      Future.delayed(Duration(seconds: 3), () {
-        print(_answers[3]['answer']);
-        print(search.length);
-      });
+      searchfromFirebase(_answers[0]['answer'], _answers[1]['answer'],
+          _answers[2]['answer'], _answers[3]['answer'], _answers[4]['answer']);
+
+      Future.delayed(Duration(seconds: 3), () {});
     }
   }
 }

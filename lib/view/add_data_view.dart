@@ -16,7 +16,13 @@ class _AddDataViewState extends State<AddDataView> {
     CollectionReference itemsRef =
         FirebaseFirestore.instance.collection('hotels_ru');
     List<String> budget = ['Дешевый', 'Средний', 'Дорогой'];
-    List<String> city = ['krsk', 'krsnd', 'vld', 'msk', 'spb', 'schi'];
+    List<String> city = [
+      'Москва',
+      'Санкт-Петербург',
+      'Краснодар',
+      'Красноярск',
+      'Владивосток',
+    ];
     List<String> img = [
       'https://www.atorus.ru/sites/default/files/upload/image/News/56149/Club_Privé_by_Belek_Club_House.jpg',
       'https://cdnn21.img.ria.ru/images/151472/35/1514723511_0:546:5244:3495_1920x0_80_0_0_b2e21246367c8a57294b5974a7809512.jpg',
@@ -32,14 +38,12 @@ class _AddDataViewState extends State<AddDataView> {
       'Люкс',
       'Номер повышенной комфортности'
     ];
-    List<String> location = ['парк', 'реку', 'городской пейзаж'];
     List<String> location_type = [
       'Центр города',
       'Рядом с аэропортом',
       'Туристическая часть',
       'Не важно'
     ];
-
     List<String> name = [
       "Оазисный дворец",
       "Золотая башня",
@@ -77,19 +81,29 @@ class _AddDataViewState extends State<AddDataView> {
     Random random = Random();
 
     // Создаем 100 документов в коллекции
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 2000; i++) {
+
+      int price = random.nextInt(4501) + 500;
+      String budget = "";
+
+      if (price < 1000) {
+        budget = "Дешевый";
+      } else if (price > 1000 && price < 2000) {
+        budget = "Средний";
+      } else {
+        budget = "Дорогой";
+      }
+
       await itemsRef.add({
-        'budget': budget[random.nextInt(budget.length)],
+        'budget': budget,
         // int
         'city': city[random.nextInt(city.length)],
         // string
         'img': img[random.nextInt(img.length)],
         // string
         'level_rooms': level_rooms[random.nextInt(level_rooms.length)],
-        // string
+        //bool
         'like': false,
-        // bool
-        'location': location[random.nextInt(location.length)],
         // string
         'location_type': location_type[random.nextInt(location_type.length)],
         // string
@@ -97,7 +111,7 @@ class _AddDataViewState extends State<AddDataView> {
         // string
         'places': place[random.nextInt(place.length)],
         // string
-        'price': '${random.nextInt(4501) + 500}',
+        'price': '${price}',
         // string
         'rate': '${random.nextInt(8) + 3}',
         // string
