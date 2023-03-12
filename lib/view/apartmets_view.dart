@@ -34,7 +34,7 @@ class _ApartmentViewState extends State<ApartmentView> {
   void searchfromFirebase(String query) async {
     try {
       final documentSnapshot = await FirebaseFirestore.instance
-          .collection('москва')
+          .collection('hotels_ru')
           .doc(args.searchResult['id'])
           .get();
       if (documentSnapshot.exists) {
@@ -53,7 +53,7 @@ class _ApartmentViewState extends State<ApartmentView> {
     try {
       // Get a reference to the document to update
       final documentReference =
-          FirebaseFirestore.instance.collection('москва').doc(documentId);
+          FirebaseFirestore.instance.collection('hotels_ru').doc(documentId);
 
       // Update the 'favorite' field
       await documentReference.update({'like': newValue});

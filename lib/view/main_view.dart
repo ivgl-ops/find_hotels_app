@@ -265,6 +265,65 @@ class _MainViewState extends State<MainView> {
                 }
               },
             ),
+            Container(
+              margin: const EdgeInsets.only(left: 20, top: 15),
+              child: const CustomText(
+                text: "Рекомендации",
+                fontWeight: FontWeight.bold,
+                size: 25,
+                align: TextAlign.start,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(
+                  left: 20, top: 15, right: 20, bottom: 50),
+              height: 200,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                  color: Colors.amber, borderRadius: BorderRadius.circular(25)),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(
+                      left: 20,
+                    ),
+                    child: CustomText(
+                      text:
+                          "Мы составим для персональную подборку под ваши цели",
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      align: TextAlign.start,
+                      size: 20,
+                    ),
+                  ),
+                  Spacer(),
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.pushNamed(context, '/question');
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(left: 20, right: 20),
+                      height: 50,
+                      width: double.infinity,
+                      color: Colors.lightBlue,
+                      child: Center(
+                          child: CustomText(
+                            size: 20,
+                        text: 'Подобрать отель',
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                      )),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  )
+                ],
+              ),
+            ),
           ],
         ),
       ),

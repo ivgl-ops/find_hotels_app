@@ -6,6 +6,7 @@ import 'package:find_hotels_app/view/filter_hotels_view.dart';
 import 'package:find_hotels_app/view/list_hotels_view.dart';
 import 'package:find_hotels_app/view/main_view.dart';
 import 'package:find_hotels_app/view/num_person_view.dart';
+import 'package:find_hotels_app/view/question.dart';
 import 'package:find_hotels_app/view/start_view.dart';
 import 'package:find_hotels_app/viewModel/num_person_viewmodel.dart';
 import 'package:flutter/material.dart';
@@ -54,9 +55,10 @@ class MyApp extends StatelessWidget {
           '/filter': ((context) => const FilterHotelsView()),
           '/apartment': ((context) => ApartmentView()),
           '/favorites': ((context) => FavoriteHotelsView()),
-          '/start': ((context) => StartView(index: 2))
+          '/start': ((context) => StartView(index: 2)),
+          '/question': ((context) => QuestionScreen())
         },
-        home: StartView(index: 0,),
+        home: StartView(index: 0,)
       ),
     );
   }

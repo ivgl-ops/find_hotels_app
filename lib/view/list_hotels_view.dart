@@ -25,7 +25,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
 
   void searchfromFirebase(String query) async {
     final result = await FirebaseFirestore.instance
-        .collection('москва')
+        .collection('hotels_ru')
         .where('city', isEqualTo: 'msk')
         .get();
 
@@ -62,7 +62,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
     final args = ModalRoute.of(context)!.settings.arguments as SearchHotels;
 
     final Query<Map<String, dynamic>> place = FirebaseFirestore.instance
-        .collection(args.city.toLowerCase())
+        .collection('hotels_ru')
         .orderBy(context.watch<GetHotel>().getHotels,
             descending: context.watch<GetHotel>().maxtoMinRate);
 
@@ -321,7 +321,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                 stream: place.snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
-                  searchfromFirebase('москва');
+                  searchfromFirebase('hotels_ru');
                   if (!snapshot.hasData) {
                     return const Center(
                       child: CircularProgressIndicator(),
@@ -363,8 +363,6 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                       itemCount: searchResult.length,
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
-                        final DocumentSnapshot documentSnapshot =
-                            snapshot.data!.docs[index];
                         final bool favotiteHotel = searchResult[index]['like'];
                         getPriceForPeople(
                           args.days.inDays.toInt() + 1,
