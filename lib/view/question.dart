@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:find_hotels_app/view/list_hotels_view.dart';
 import 'package:flutter/material.dart';
 
 class QuestionScreen extends StatefulWidget {
@@ -16,7 +17,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
     String level_rooms,
     String location_type,
     String budget,
-
   ) async {
     final result = await FirebaseFirestore.instance
         .collection('hotels_ru')
@@ -35,6 +35,18 @@ class _QuestionScreenState extends State<QuestionScreen> {
               })
           .toList();
     });
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => ListHotelsView(
+              isRec: true,
+              city: city,
+              places: places,
+              level_rooms: level_rooms,
+              location_type: location_type,
+              budget: budget)),
+    );
 
     print(search);
   }
@@ -74,11 +86,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
         'Туристическая часть',
         'Не важно'
       ]
-    },
-    {
-      'question':
-          'Хотели бы вы остановиться в отеле с видом на парк, реку или городской пейзаж?',
-      'options': ['Вид на парк', 'Вид на речку', 'Вид на городской пейзаж']
     },
     {
       'question': 'Какой бюджет вы рассматриваете?',

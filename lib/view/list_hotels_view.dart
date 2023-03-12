@@ -36,7 +36,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
   final _pageSize = 5;
   final _controller = ScrollController();
   var _isFetchingMore = false;
-  final List<DocumentSnapshot> _documents = [];
+  final List _documents = [];
 
   @override
   void initState() {
@@ -81,7 +81,10 @@ class _ListHotelsViewState extends State<ListHotelsView> {
         .get()
         .then((querySnapshot) {
       setState(() {
-        _documents.addAll(querySnapshot.docs);
+        _documents.addAll(querySnapshot.docs.map((doc) => {
+              'id': doc.id,
+              ...doc.data(),
+            }));
       });
     });
   }
@@ -94,7 +97,10 @@ class _ListHotelsViewState extends State<ListHotelsView> {
         .get()
         .then((querySnapshot) {
       setState(() {
-        _documents.addAll(querySnapshot.docs);
+        _documents.addAll(querySnapshot.docs.map((doc) => {
+              'id': doc.id,
+              ...doc.data(),
+            }));
       });
     });
   }
@@ -113,7 +119,10 @@ class _ListHotelsViewState extends State<ListHotelsView> {
           .get()
           .then((querySnapshot) {
         setState(() {
-          _documents.addAll(querySnapshot.docs);
+          _documents.addAll(querySnapshot.docs.map((doc) => {
+                'id': doc.id,
+                ...doc.data(),
+              }));
           _isFetchingMore = false;
         });
       });
@@ -140,7 +149,10 @@ class _ListHotelsViewState extends State<ListHotelsView> {
           .get()
           .then((querySnapshot) {
         setState(() {
-          _documents.addAll(querySnapshot.docs);
+          _documents.addAll(querySnapshot.docs.map((doc) => {
+                'id': doc.id,
+                ...doc.data(),
+              }));
           _isFetchingMore = false;
         });
       });
@@ -166,7 +178,13 @@ class _ListHotelsViewState extends State<ListHotelsView> {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as SearchHotels;
+    SearchHotels args;
+    if (widget.isRec) {
+      args =
+          SearchHotels(DateTime(1), DateTime(1), 'msk', "2", Duration(days: 1));
+    } else {
+      args = ModalRoute.of(context)!.settings.arguments as SearchHotels;
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text('Lazy Loading Screen'),
@@ -199,7 +217,6 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                     _documents[index]['price'],
                   ),
                 );
-
                 return GestureDetector(
                   onTap: () {
                     Navigator.pushNamed(context, '/apartment',
