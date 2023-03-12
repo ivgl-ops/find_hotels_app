@@ -18,12 +18,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
     String budget,
 
   ) async {
-    print(city);
-    print(places);
-    print(level_rooms);
-    print(location_type);
-    print(budget);
-
     final result = await FirebaseFirestore.instance
         .collection('hotels_ru')
         .where('city', isEqualTo: city)
@@ -41,6 +35,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
               })
           .toList();
     });
+
     print(search);
   }
 

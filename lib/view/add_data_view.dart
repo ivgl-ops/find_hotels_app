@@ -93,8 +93,9 @@ class _AddDataViewState extends State<AddDataView> {
       } else {
         budget = "Дорогой";
       }
-
+      String documentId = itemsRef.doc().id;
       await itemsRef.add({
+        'ID': documentId,
         'budget': budget,
         // int
         'city': city[random.nextInt(city.length)],
