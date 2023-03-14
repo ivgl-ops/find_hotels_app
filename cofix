@@ -1,0 +1,1053 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:cofix/app/app_assets.dart';
+import 'package:cofix/app/di.dart';
+import 'package:cofix/app/models/department.dart';
+import 'package:cofix/app/services/service_animation.dart';
+import 'package:cofix/app/services/service_app_data.dart';
+import 'package:cofix/app/services/service_country.dart';
+import 'package:cofix/app/services/service_departments.dart';
+import 'package:cofix/app/services/service_map.dart';
+import 'package:cofix/app/services/service_tools.dart';
+import 'package:cofix/configs/config.dart';
+import 'package:cofix/views/departments/map/screen_department_search.dart';
+import 'package:cofix/views/departments/map/widget/maps_provider.dart';
+import 'package:cofix/views/departments/map/widget/widget_map.dart';
+import 'package:cofix/views/departments/map/widget_department.dart';
+import 'package:cofix/views/departments/map/widget_filters.dart';
+import 'package:cofix/views/departments/map/widget_geo_error.dart';
+import 'package:cofix/views/departments/map/widget_list.dart';
+import 'package:cofix/views/widgets/app_bar_collapsable.dart';
+import 'package:cofix/views/widgets/widget_animated_counter.dart';
+import 'package:cofix/views/widgets/widget_general_dialog.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_support/support/tools/tools_navigator.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+
+import '../../widgets/app_icon_button.dart';
+import '../../widgets/haptic_widget.dart';
+
+class ScreenDepartmentsMap extends StatefulWidget {
+  final List<MDepartment> initDepartments;
+  final bool isOpenOnMap;
+  final FiltersState selectedFilter;
+
+  const ScreenDepartmentsMap({
+    Key? key,
+    required this.initDepartments,
+    required this.selectedFilter,
+    this.isOpenOnMap = false,
+  }) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => ScreenDepartmentsMapState();
+}
+
+class ScreenDepartmentsMapState extends State<ScreenDepartmentsMap> {
+  static final Key mapKey = Key('mapKey');
+
+  late FiltersState filtersState;
+  WidgetDepartmentsCounterController departmentsCounterController =
+      WidgetDepartmentsCounterController();
+  WidgetMapController mapController = MapsProvider.instanceMapController();
+
+  ScrollController scrollController = ScrollController();
+  DraggableScrollableController bottomSheetController =
+      DraggableScrollableController();
+
+  List<MDepartment> filteredDepartments = [];
+  bool isListSelected = true;
+  MDepartment? currentDepartment;
+  bool hasNearest = false;
+  bool isFillBackground = false;
+  double minSheetSize = 0.35;
+
+  int oldVisibleDepartmentsCount = 0;
+  final PageController _pageViewController = PageController(initialPage: 0);
+
+  @override
+  void initState() {
+    super.initState();
+    filtersState = FiltersState();
+    filteredDepartments = filtersState.apply(widget.initDepartments);
+    setIsListSelected(true);
+
+    //  Выбирается кофейня последнего заказа
+    if (di<ServiceAppData>().getMe().lastOrder.idDepartment != 0) {
+      for (MDepartment m in filteredDepartments) {
+        if (m.id == di<ServiceAppData>().getMe().lastOrder.idDepartment) {
+          setCurrentDepartment(m);
+          break;
+        }
+      }
+    }
+
+    Timer(Duration(milliseconds: 1000), () {
+      onToMyPositionTap(requestPermission: false);
+    });
+
+    var nearestFilter = FiltersState()..isNearest = true;
+    hasNearest = nearestFilter.apply(widget.initDepartments).isNotEmpty;
+
+    filtersState = widget.selectedFilter;
+    updateFilters();
+
+    if (widget.isOpenOnMap) {
+      setIsListSelected(false);
+    }
+    replayAnimation();
+  }
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    bottomSheetController.dispose();
+    mapController.dispose();
+    _pageViewController.dispose();
+    super.dispose();
+  }
+
+
+
+  void onFranchiseTap() {
+    String link = di<ServiceAppData>().getFranchise();
+
+    if (link.isEmpty) {
+      return;
+    }
+    di<ServiceTools>().launch(
+      link,
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
+  void onCofixTap() {
+    di<ServiceTools>().launch(di<ServiceCountry>().getCountry().linkAbout);
+  }
+
+  void onDepartmentOnMapTap(MDepartment mDepartment) {
+    setCurrentDepartment(mDepartment);
+    int page = mapController.getVisibleDepartment().indexOf(currentDepartment!);
+    _pageViewController.jumpToPage(page);
+  }
+
+  void setIsListSelected(bool isListSelected) {
+    if (!di<Config>().isMapsEnabled && !isListSelected) {
+      return;
+    }
+    this.isListSelected = isListSelected;
+    setState(() {});
+  }
+
+  void setCurrentDepartment(
+    MDepartment? mDepartment, {
+    bool updatePosition = false,
+  }) {
+    currentDepartment = mDepartment;
+    setState(() {});
+    if (updatePosition) {
+      onToMyPositionTap();
+    }
+  }
+
+  void onBackTap() async {
+    //  https://github.com/flutter/flutter/issues/105965
+    //  Без задержки есть шанс что приложение вылетит на Android из-за Google-Maps
+    if (Platform.isAndroid) {
+      await Future.delayed(Duration(milliseconds: 500));
+    }
+    if (mounted) {
+      di<ToolsNavigator>().pop(context);
+    }
+  }
+
+  void onTabMapTap() {
+    setIsListSelected(false);
+  }
+
+  void onTabListTap() {
+    setIsListSelected(true);
+  }
+
+  void onToMyPositionTap({
+    bool requestPermission = true,
+  }) async {
+    Position? position = di<ServiceMap>().getLastUserPosition();
+    if (position != null) {
+      mapController.moveCamera(position.latitude, position.longitude);
+    } else {
+      double latitude = di<ServiceCountry>().getCountry().getLatitude();
+      double longitude = di<ServiceCountry>().getCountry().getLongitude();
+
+      if (latitude != 0 || longitude != 0) {
+        mapController.moveCamera(latitude, longitude);
+      }
+
+      if (requestPermission) {
+        di<ServiceMap>().updateMyPosition(
+          onUpdated: () {
+            onToMyPositionTap(requestPermission: false);
+          },
+          onError: (e) {
+            WidgetGeneralDialog.show(context, () => WidgetGeoError());
+          },
+        );
+      }
+    }
+  }
+
+  void updateFilters() {
+    filteredDepartments = filtersState.apply(widget.initDepartments);
+    MDepartment? newNearestDepartment =
+        di<ServiceDepartments>().getNearestDepartment(filteredDepartments);
+    if ((newNearestDepartment?.getUserDistanceMetre() ?? 0) < 5000 &&
+        newNearestDepartment != currentDepartment) {
+      setCurrentDepartment(
+        newNearestDepartment,
+        updatePosition: false,
+      );
+    }
+
+    if (filteredDepartments.isEmpty) {
+      onToMyPositionTap();
+    } else {
+      showAll();
+    }
+    setState(() {});
+  }
+
+  void onSearchTap() {
+    di<ToolsNavigator>().push(
+      context,
+      ScreenDepartmentSearch(
+        mDepartments: widget.initDepartments,
+      ),
+    );
+  }
+
+  void onFiltersTap() {
+    WidgetGeneralDialog.show(
+      context,
+      () => WidgetFilters(
+        initFiltersState: filtersState,
+        initDepartments: widget.initDepartments,
+        onFiltersChanged: (newFiltersState) {
+          filtersState = newFiltersState;
+          bottomSheetController.animateTo(
+            0,
+            duration: Duration(milliseconds: 300),
+            curve: Curves.ease,
+          );
+          updateFilters();
+        },
+      ),
+    );
+  }
+
+  void onFavoriteTap() {
+    filtersState = FiltersState();
+    filtersState.isFavorite = true;
+    bottomSheetController.animateTo(
+      0,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.ease,
+    );
+    updateFilters();
+  }
+
+  void showAll() {
+    List<Position> points = filteredDepartments
+        .map((e) => e.getPosition())
+        .whereType<Position>()
+        .toList();
+    if (points.isNotEmpty) {
+      mapController.moveCameraToPoints(points);
+    } else {
+      onToMyPositionTap();
+    }
+  }
+
+  void onNearestTap() {
+    filtersState = FiltersState();
+    filtersState.isNearest = true;
+    bottomSheetController.animateTo(
+      0,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.ease,
+    );
+    updateFilters();
+  }
+
+  bool isHasFranchise() {
+    return di<ServiceAppData>().getFranchise().isNotEmpty &&
+        mapController.getVisiblePoints() < 1 &&
+        currentDepartment == null;
+  }
+
+  //
+  //  Animation
+  //
+
+  static Duration animationDuration = di<ServiceAnimation>().duration(300);
+
+  double sizeWidgetCard = 135;
+  bool isWidgetBiggerMap = false;
+  bool isWidgetEnabledMetro = true;
+  bool enabledCounter = true;
+
+  late double animationTitle;
+  late double animationFilters;
+
+  void animate(int ms, VoidCallback fn) {
+    di<ServiceAnimation>().callback(ms, () {
+      if (mounted) {
+        setState(fn);
+      }
+    });
+  }
+
+  void replayAnimation() {
+    animationTitle = 0;
+    animationFilters = 0;
+
+    setState(() {});
+
+    WidgetsBinding.instance.addPostFrameCallback((duration) {
+      setState(() {});
+
+      animationTitle = 1;
+      animate(200, () => animationFilters = 1);
+    });
+    setState(() {});
+  }
+
+  bool scrollListener(ScrollNotification scrollInfo) {
+    if (scrollInfo.metrics.axis == Axis.vertical) {
+      setState(() {
+        double screenH = MediaQuery.of(context).size.height * 0.7;
+        isFillBackground = currentDepartment != null &&
+            bottomSheetController.isAttached &&
+            bottomSheetController.pixels > screenH - screenH * minSheetSize;
+
+        if (bottomSheetController.isAttached && isFillBackground) {
+          sizeWidgetCard = 350;
+          isWidgetBiggerMap = true;
+          isWidgetEnabledMetro = false;
+          enabledCounter = false;
+        } else {
+          sizeWidgetCard = 135;
+          isWidgetBiggerMap = false;
+          isWidgetEnabledMetro = true;
+          enabledCounter = true;
+          setState(() {});
+        }
+      });
+    }
+    return true;
+  }
+
+  //
+  //  Widget
+  //
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () {
+        onBackTap();
+        return Future.value(false);
+      },
+      child: Scaffold(
+        // AppBar здесь нужен для установки цвета статусбара
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          toolbarHeight: 0,
+          backgroundColor: Color(isListSelected ? 0xffFFFFFF : 0xff181818),
+          elevation: 0,
+        ),
+        backgroundColor: Colors.transparent,
+        body: NotificationListener(
+          onNotification: scrollListener,
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 300),
+            curve: Curves.ease,
+            color: Color(isListSelected ? 0xffFFFFFF : 0xff181818),
+            child: Stack(
+              children: [
+                Offstage(
+                  offstage: !isListSelected,
+                  child: buildList(),
+                ),
+                Offstage(
+                  offstage: isListSelected,
+                  child: buildMap(),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildTitle() {
+    return AppBarCollapsable(
+      titleText: appStrings.departmentListTitle,
+      onTapBack: onBackTap,
+      scrollController: scrollController,
+      animationTitle: animationTitle,
+      color: Color(isListSelected ? 0xff181818 : 0xffFFFFFF),
+    );
+  }
+
+  Widget buildNavigationRow() {
+    int filtersCount = filtersState.getFiltersCount();
+
+    return AnimatedOpacity(
+      opacity: animationFilters,
+      duration: animationDuration,
+      curve: Curves.ease,
+      child: Container(
+        padding: EdgeInsets.only(left: 25, right: 25),
+        child: Row(
+          children: [
+            if (di<Config>().isMapsEnabled) ...[
+              buildNavigationButton(
+                name: appStrings.departmentListTabMap,
+                isSelected: !isListSelected,
+                onTap: () {
+                  onTabMapTap();
+                },
+              ),
+              SizedBox(width: 5),
+              buildNavigationButton(
+                name: appStrings.departmentListTabList,
+                isSelected: isListSelected,
+                onTap: onTabListTap,
+              ),
+            ],
+            Spacer(),
+            buildHapticButton(icon: AppAssets.iconSearch, onTap: onSearchTap),
+            SizedBox(width: 5),
+            buildHapticButton(
+              icon: AppAssets.iconSettings,
+              onTap: onFiltersTap,
+              counter: filtersCount,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildHapticButton({
+    required Function()? onTap,
+    required String icon,
+    int counter = 0,
+  }) {
+    return HapticWidget(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(9999),
+          border: Border.all(
+            color: Color(isListSelected ? 0xff181818 : 0xffFFFFFF)
+                .withOpacity(counter > 0 ? 1 : 0.2),
+            width: 2,
+          ),
+        ),
+        child: Row(
+          children: [
+            if (counter > 0)
+              Container(
+                padding: EdgeInsets.only(top: 2, right: 6),
+                child: Text(
+                  counter.toString(),
+                  style: CustomTextStyle(
+                    fontSize: 14,
+                    height: 14 / 14,
+                    color: Color(isListSelected ? 0xff181818 : 0xffFFFFFF),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            SvgPicture.asset(
+              icon,
+              height: 16,
+              color: Color(isListSelected ? 0xff181818 : 0xffFFFFFF),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildNavigationButton({
+    required String name,
+    required bool isSelected,
+    required Function() onTap,
+  }) {
+    return HapticWidget(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.ease,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          color: Color(
+            isSelected
+                ? (isListSelected ? 0xff181818 : 0xffFFFFFF)
+                : (isListSelected ? 0xffFFFFFF : 0xff181818),
+          ).withOpacity(isSelected ? 1 : 0),
+          border: Border.all(
+            color: Color(isListSelected ? 0xff181818 : 0xffFFFFFF)
+                .withOpacity(0.2),
+            width: 2,
+          ),
+        ),
+        height: 40,
+        alignment: Alignment.center,
+        padding: EdgeInsets.only(left: 14, right: 14),
+        child: Text(
+          name.toUpperCase(),
+          style: CustomTextStyle(
+            color: Color(
+              isSelected
+                  ? (isListSelected ? 0xffFFFFFF : 0xff181818)
+                  : (isListSelected ? 0xff181818 : 0xffFFFFFF),
+            ),
+            fontSize: 14,
+            height: 20 / 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  //
+  //  List
+  //
+
+  Widget buildList() {
+    return CustomScrollView(
+      physics: ClampingScrollPhysics(),
+      slivers: [
+        buildSliverAppBar(),
+        WidgetList(
+          mDepartments: filteredDepartments,
+          scrollController: scrollController,
+          navigationRowBuilder: buildNavigationRow,
+          filtersState: filtersState,
+        ),
+      ],
+    );
+  }
+
+  SliverAppBar buildSliverAppBar() {
+    return SliverAppBar(
+      automaticallyImplyLeading: false,
+      floating: false,
+      expandedHeight: 86,
+      collapsedHeight: 66,
+      elevation: 0,
+      toolbarHeight: 66,
+      pinned: true,
+      backgroundColor: Colors.transparent,
+      foregroundColor: Color(0xff181818),
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+      flexibleSpace: Builder(
+        builder: (context) {
+          const expandedFontSize = 24.0;
+          const collapsedFontSize = 20.0;
+
+          final FlexibleSpaceBarSettings settings = context
+              .dependOnInheritedWidgetOfExactType<FlexibleSpaceBarSettings>()!;
+          final double maxExtent = settings.maxExtent - settings.minExtent;
+          final double currentExtent =
+              settings.currentExtent - settings.minExtent;
+          final double localPercent = currentExtent / maxExtent;
+          var fontSize = collapsedFontSize +
+              (expandedFontSize - collapsedFontSize) * localPercent;
+          return Container(
+            color: localPercent == 1.0 ? Colors.transparent : Color(0xffFFFFFF),
+            child: AnimatedContainer(
+              duration: animationDuration,
+              curve: Curves.ease,
+              padding: EdgeInsets.only(
+                left: 10 + (5 - 5 * animationTitle),
+                right: 15,
+              ),
+              child: Stack(
+                children: [
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: AppIconButton(
+                      AppAssets.iconBack,
+                      onTap: onBackTap,
+                      framePadding: 10,
+                      color: Color(0xff181818),
+                    ),
+                  ),
+                  Container(
+                    alignment: Alignment.center,
+                    margin: EdgeInsets.only(top: 1),
+                    child: Text(
+                      appStrings.departmentListTitle.toUpperCase(),
+                      style: CustomTextStyle(
+                        color: Color(0xff181818),
+                        fontSize: fontSize,
+                        height: 30 / fontSize,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  //
+  //  Map
+  //
+
+  Widget buildMap() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        buildTitle(),
+        SizedBox(height: 30),
+        buildNavigationRow(),
+        SizedBox(height: 20),
+        Expanded(
+          child: Stack(
+            children: [
+              MapsProvider.instanceMapWidget(
+                key: mapKey,
+                currentDepartment: currentDepartment,
+                widgetMapController: mapController,
+                mDepartments: filteredDepartments,
+                onDepartmentClicked: onDepartmentOnMapTap,
+                onVisiblePointsCountChanged: () {
+                  int count = mapController.getVisiblePoints();
+                  if ((count > 0 && oldVisibleDepartmentsCount < 1) ||
+                      (oldVisibleDepartmentsCount > 0 && count < 1)) {
+                    setState(() {});
+                  }
+                  oldVisibleDepartmentsCount = count;
+                  departmentsCounterController.onCountChanged?.call(count);
+                },
+                devicePixelRatio: MediaQuery.of(context).devicePixelRatio,
+              ),
+              IgnorePointer(
+                child: Container(
+                  margin: EdgeInsets.only(left: 17, top: 20),
+                  height: 120,
+                  child: WidgetDepartmentsCounter(
+                    controller: departmentsCounterController,
+                    initCount: mapController.getVisiblePoints(),
+                  ),
+                ),
+              ),
+              IgnorePointer(
+                ignoring: !isFillBackground,
+                child: AnimatedOpacity(
+                  opacity: isFillBackground ? 1 : 0,
+                  duration: animationDuration,
+                  curve: Curves.ease,
+                  child: Container(
+                    color: Color(0xff181818),
+                  ),
+                ),
+              ),
+              AnimatedOpacity(
+                curve: Curves.ease,
+                opacity: isFillBackground ? 0 : 1,
+                duration: animationDuration,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: onToMyPositionTap,
+                    child: Container(
+                      padding: EdgeInsets.all(14),
+                      margin: EdgeInsets.only(right: 25),
+                      decoration: BoxDecoration(
+                        color: Color(0xffffffff),
+                        borderRadius: BorderRadius.circular(9999),
+                      ),
+                      child: SvgPicture.asset(AppAssets.iconGeo, width: 22),
+                    ),
+                  ),
+                ),
+              ),
+              if (isHasFranchise())
+                Container(
+                  alignment: Alignment.bottomCenter,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      IgnorePointer(
+                        child: Container(
+                          padding: EdgeInsets.only(left: 25, right: 86),
+                          child: Text(
+                            appStrings.departmentListFranchise.toUpperCase(),
+                            style: CustomTextStyle(
+                              fontSize: 30,
+                              height: 30 / 30,
+                              color: Color(0xffffffff),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      ...buildBottomButtons(),
+                      SizedBox(height: 40),
+                    ],
+                  ),
+                ),
+              buildBottomSheet(),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> buildBottomButtons() {
+    bool hasFavorite =
+        di<ServiceAppData>().getMe().favoriteDepartment.isNotEmpty;
+
+    List<Widget> buttons = [
+      if (hasNearest)
+        buildBottomSheetOption(
+          name: appStrings.departmentListCategoryTitleNearest,
+          subtitle: '',
+          onTap: onNearestTap,
+        ),
+      if (hasFavorite)
+        buildBottomSheetOption(
+          name: appStrings.departmentListCategoryTitleFavorite,
+          subtitle:
+              di<ServiceAppData>().getMe().favoriteDepartment.length.toString(),
+          onTap: onFavoriteTap,
+        ),
+      if (isHasFranchise()) ...[
+        buildBottomSheetOption(
+          name: appStrings.franchiseTitle,
+          subtitle: '',
+          onTap: onFranchiseTap,
+        ),
+        buildBottomSheetOption(
+          name: appStrings.franchiseTitleCofix,
+          subtitle: '',
+          onTap: onCofixTap,
+        ),
+      ]
+    ];
+    List<Widget> buttonsWithDividers = [];
+
+    for (int i = 0; i < buttons.length; i++) {
+      if (i > 0) {
+        buttonsWithDividers.add(
+          Container(
+            height: 2,
+            margin: EdgeInsets.only(left: 25, right: 25),
+            decoration: BoxDecoration(
+              color: Color(0xffffffff).withOpacity(0.4),
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+        );
+      }
+      buttonsWithDividers.add(buttons[i]);
+    }
+
+    return buttonsWithDividers;
+  }
+
+  Widget buildBottomSheet() {
+    if (currentDepartment == null) {
+      return Container();
+    }
+
+    List<Widget> list = [];
+
+    if (currentDepartment != null) {
+      list.add(
+        SizedBox(
+          height: 25,
+        ),
+      );
+    }
+
+    //Сортировка кофеен по растоянию
+    List<MDepartment> sortedMDepartmentList = [];
+    sortedMDepartmentList.addAll(mapController.getVisibleDepartment());
+    sortedMDepartmentList.sort(
+      (a, b) {
+        double? aDist = a.getAnyDistanceMetre();
+        double? bDist = b.getAnyDistanceMetre();
+
+        if (aDist == null) {
+          return 1;
+        }
+        if (bDist == null) {
+          return -1;
+        }
+
+        int dif = (aDist - bDist).toInt();
+
+        return dif;
+      },
+    );
+
+    int activePage = sortedMDepartmentList.indexOf(currentDepartment!);
+
+    //если есть такая страница то переходим на нее иначе initpage
+    _pageViewController.hasClients
+        ? _pageViewController.jumpToPage(activePage)
+        : _pageViewController.initialPage;
+
+    list.add(
+      Column(
+        children: [
+          AnimatedSize(
+            duration: Duration(milliseconds: 300),
+            child: SizedBox(
+              height: sizeWidgetCard,
+              child: PageView.builder(
+                controller: _pageViewController,
+                onPageChanged: (int index) {
+                  currentDepartment = sortedMDepartmentList[index];
+                  setState(() {});
+                },
+                itemCount: sortedMDepartmentList.length,
+                itemBuilder: (context, position) {
+                  return Container(
+                    padding: EdgeInsets.only(left: 10, right: 10),
+                    child: WidgetDepartment(
+                      isAdressVisible: isWidgetBiggerMap,
+                      isMetroStationVisible: isWidgetEnabledMetro,
+                      mDepartment: sortedMDepartmentList[position],
+                      isFadeWhenClosed: false,
+                      isLostCartFutureEnabled:
+                          currentDepartment == sortedMDepartmentList[position],
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          SizedBox(height: 10),
+          // отображение точек или цифер в завфисимости от количества кофеен
+          if (sortedMDepartmentList.isEmpty ||
+              sortedMDepartmentList.length == 1 ||
+              enabledCounter == false) ...[
+            SizedBox()
+          ] else ...[
+            if (sortedMDepartmentList.length < 3) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List<Widget>.generate(
+                  sortedMDepartmentList.length,
+                  (index) => Padding(
+                    padding: const EdgeInsets.only(left: 6),
+                    child: InkWell(
+                      onTap: () {
+                        _pageViewController.animateToPage(
+                          index,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeIn,
+                        );
+                      },
+                      child: activePage == index
+                          ? Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                            )
+                          : Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2.0,
+                                ),
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                            ),
+                    ),
+                  ),
+                ),
+              ),
+            ] else ...[
+              // при большом зуме данная переменная может быть равная -1
+              activePage == -1
+                  ? Text(
+                      '${activePage + 2} / ${sortedMDepartmentList.length}',
+                      style: CustomTextStyle(
+                        color: Color(0xffFFFFFF),
+                        fontSize: 14,
+                        height: 10 / 10,
+                      ),
+                    )
+                  : Text(
+                      '${activePage + 1} / ${sortedMDepartmentList.length}',
+                      style: CustomTextStyle(
+                        color: Color(0xffFFFFFF),
+                        fontSize: 14,
+                        height: 10 / 10,
+                      ),
+                    ),
+            ]
+          ]
+        ],
+      ),
+    );
+
+    List<Widget> buttons = buildBottomButtons();
+
+    if (buttons.isNotEmpty) {
+      list.add(SizedBox(height: 40));
+      list.addAll(buttons);
+      list.add(SizedBox(height: 40));
+    }
+    if (list.isEmpty) {
+      return Container();
+    }
+    return LayoutBuilder(
+      builder: (context, constrains) {
+        return DraggableScrollableSheet(
+          controller: bottomSheetController,
+          minChildSize: minSheetSize,
+          initialChildSize: minSheetSize,
+          maxChildSize: 1,
+          builder: (context, scrollController) {
+            return SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
+              controller: scrollController,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: list,
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget buildBottomSheetOption({
+    required String name,
+    required String subtitle,
+    required Function() onTap,
+  }) {
+    return Container(
+      padding: EdgeInsets.only(left: 25, right: 25),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: EdgeInsets.only(top: 4, bottom: 4),
+          color: Colors.transparent,
+          child: Row(
+            children: [
+              Text(
+                name.toUpperCase(),
+                style: CustomTextStyle(
+                  fontSize: 40,
+                  height: 40 / 40,
+                  color: Color(0xffffffff),
+                ),
+              ),
+              Spacer(),
+              Text(
+                subtitle.toUpperCase(),
+                style: CustomTextStyle(
+                  fontSize: 12,
+                  height: 12 / 12,
+                  color: Color(0xffffffff),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Оптимизация. Чтобы не перерисовывать часто весь экран.
+/// Были проблемы с производительностью CF-1012
+class WidgetDepartmentsCounter extends StatefulWidget {
+  final WidgetDepartmentsCounterController controller;
+  final int initCount;
+
+  const WidgetDepartmentsCounter({
+    Key? key,
+    required this.controller,
+    required this.initCount,
+  }) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => WidgetDepartmentsCounterState();
+}
+
+class WidgetDepartmentsCounterState extends State<WidgetDepartmentsCounter> {
+  int count = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    resetLister();
+  }
+
+  @override
+  void didUpdateWidget(covariant WidgetDepartmentsCounter oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    resetLister();
+  }
+
+  void resetLister() {
+    count = widget.initCount;
+    widget.controller.onCountChanged = (newCount) {
+      if (mounted) {
+        setState(() {
+          count = newCount;
+        });
+      }
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WidgetAnimatedCounter(
+      value: count,
+      textStyle: CustomTextStyle(
+        fontSize: 120,
+        height: 120 / 120,
+        color: Color(0xffffffff),
+      ),
+    );
+  }
+}
+
+class WidgetDepartmentsCounterController {
+  Function(int)? onCountChanged;
+}
