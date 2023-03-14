@@ -86,6 +86,7 @@ class _FavoriteHotelsViewState extends State<FavoriteHotelsView> {
                         '/apartment',
                         arguments: ApartmentDataView(
                           searchResult[index],
+                          '',
                           int.parse(searchResult[index]['price']),
                           '2',
                           Duration(days: 2),

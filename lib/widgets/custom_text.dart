@@ -9,9 +9,11 @@ class CustomText extends StatelessWidget {
       this.fontWeight,
       this.align,
       this.color,
+      this.maxLines,
       this.underline});
 
   final TextAlign? align;
+  final int? maxLines;
   final Color? color;
   final FontWeight? fontWeight;
   final double? size;
@@ -20,13 +22,16 @@ class CustomText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text,
-        textAlign: align,
-        style: GoogleFonts.montserrat(
-          fontSize: size,
-          fontWeight: fontWeight,
-          color: color,
-          decoration: underline,
-        ));
+    return Text(
+      text,
+      textAlign: align,
+      style: GoogleFonts.montserrat(
+        fontSize: size,
+        fontWeight: fontWeight,
+        color: color,
+        decoration: underline,
+      ),
+      maxLines: maxLines,
+    );
   }
 }

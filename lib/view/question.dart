@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_hotels_app/view/list_hotels_view.dart';
 import 'package:flutter/material.dart';
 
+import '../widgets/custom_text.dart';
+
 class QuestionScreen extends StatefulWidget {
   @override
   _QuestionScreenState createState() => _QuestionScreenState();
@@ -34,6 +36,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                 ...doc.data(),
               })
           .toList();
+      print('count ${search.length}');
     });
 
     Navigator.push(
@@ -104,16 +107,40 @@ class _QuestionScreenState extends State<QuestionScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              _questions[_currentQuestionIndex]['question'],
-              style: TextStyle(fontSize: 24),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 20),
+              child: Center(
+                child: CustomText(
+                  text: _questions[_currentQuestionIndex]['question'],
+                  size: 25,
+                  fontWeight: FontWeight.bold,
+                  align: TextAlign.center,
+                  maxLines: 2,
+                ),
+              ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 50),
             Column(
               children: _questions[_currentQuestionIndex]['options']
-                  .map<Widget>((option) => ElevatedButton(
-                        child: Text(option),
-                        onPressed: () {
+                  .map<Widget>((option) => GestureDetector(
+                        child: Container(
+                          width: double.infinity,
+                          margin:
+                              EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                          height: 50,
+                          decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(25)),
+                          child: Center(
+                            child: CustomText(
+                              text: option,
+                              size: 17,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              align: TextAlign.center,
+                              maxLines: 2,
+                            ),
+                          ),
+                        ),
+                        onTap: () {
                           // Сохранить ответ пользователя на вопрос
                           _answers.add({
                             'question': _questions[_currentQuestionIndex]

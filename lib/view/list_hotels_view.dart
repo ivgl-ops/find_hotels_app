@@ -37,6 +37,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
   final _controller = ScrollController();
   var _isFetchingMore = false;
   final List _documents = [];
+  final List _docId = [];
 
   @override
   void initState() {
@@ -77,56 +78,13 @@ class _ListHotelsViewState extends State<ListHotelsView> {
         .where('level_rooms', isEqualTo: level_rooms)
         .where('location_type', isEqualTo: location_type)
         .where('budget', isEqualTo: budget)
-        .limit(_pageSize)
+        .limit(widget.isRec ? 3 : _pageSize)
         .get()
         .then((querySnapshot) {
       setState(() {
-        _documents.addAll(querySnapshot.docs.map((doc) => {
-              'id': doc.id,
-              ...doc.data(),
-            }));
+        _documents.addAll(querySnapshot.docs.toList());
       });
     });
-  }
-
-  void _fetchData() {
-    FirebaseFirestore.instance
-        .collection('hotels_ru')
-        .orderBy('price')
-        .limit(_pageSize)
-        .get()
-        .then((querySnapshot) {
-      setState(() {
-        _documents.addAll(querySnapshot.docs.map((doc) => {
-              'id': doc.id,
-              ...doc.data(),
-            }));
-      });
-    });
-  }
-
-  void _loadMore() {
-    if (!_isFetchingMore) {
-      setState(() {
-        _isFetchingMore = true;
-      });
-
-      FirebaseFirestore.instance
-          .collection('hotels_ru')
-          .orderBy('price')
-          .startAfterDocument(_documents.last)
-          .limit(_pageSize)
-          .get()
-          .then((querySnapshot) {
-        setState(() {
-          _documents.addAll(querySnapshot.docs.map((doc) => {
-                'id': doc.id,
-                ...doc.data(),
-              }));
-          _isFetchingMore = false;
-        });
-      });
-    }
   }
 
   void _loadMoreRec(String city, String places, String level_rooms,
@@ -149,10 +107,47 @@ class _ListHotelsViewState extends State<ListHotelsView> {
           .get()
           .then((querySnapshot) {
         setState(() {
-          _documents.addAll(querySnapshot.docs.map((doc) => {
-                'id': doc.id,
-                ...doc.data(),
-              }));
+          _documents.addAll(querySnapshot.docs.toList());
+          _isFetchingMore = false;
+        });
+      });
+    }
+  }
+
+  void printDocumentIds() {
+    for (var document in _documents) {
+      _docId.add(document.id);
+    }
+  }
+
+  void _fetchData() {
+    FirebaseFirestore.instance
+        .collection('hotels_ru')
+        .orderBy('price')
+        .limit(_pageSize)
+        .get()
+        .then((querySnapshot) {
+      setState(() {
+        _documents.addAll(querySnapshot.docs.toList());
+      });
+    });
+  }
+
+  void _loadMore() {
+    if (!_isFetchingMore) {
+      setState(() {
+        _isFetchingMore = true;
+      });
+
+      FirebaseFirestore.instance
+          .collection('hotels_ru')
+          .orderBy('price')
+          .startAfterDocument(_documents.last)
+          .limit(_pageSize)
+          .get()
+          .then((querySnapshot) {
+        setState(() {
+          _documents.addAll(querySnapshot.docs);
           _isFetchingMore = false;
         });
       });
@@ -178,6 +173,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
 
   @override
   Widget build(BuildContext context) {
+    String docId = '';
     SearchHotels args;
     if (widget.isRec) {
       args =
@@ -187,139 +183,181 @@ class _ListHotelsViewState extends State<ListHotelsView> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lazy Loading Screen'),
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () {
+            if (widget.isRec) {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, '/start_menu', (route) => false);
+            } else {
+              Navigator.pop(context);
+            }
+          },
+          icon: Icon(Icons.arrow_back_ios_new_outlined, color: Colors.blue),
+        ),
+        backgroundColor: Colors.white,
+        title: CustomText(
+          color: Colors.blue,
+          text: widget.isRec ? 'На главную' : 'Отели',
+        ),
       ),
       body: _documents.isEmpty
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : ListView.builder(
-              padding: const EdgeInsets.all(10),
-              controller: _controller,
-              shrinkWrap: true,
-              itemCount: _documents.length + (_isFetchingMore ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == _documents.length) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-
-                final document = _documents[index];
-                final bool favotiteHotel = _documents[index]['like'];
-                final city = document['city'] as String;
-                final price = document['price'] as String;
-
-                getPriceForPeople(
-                  args.days.inDays.toInt() + 1,
-                  int.parse(args.people),
-                  int.parse(
-                    _documents[index]['price'],
-                  ),
-                );
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, '/apartment',
-                        arguments: ApartmentDataView(
-                          _documents[index],
-                          priceList[index],
-                          args.people,
-                          args.days,
-                        ));
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    height: 300,
-                    margin: const EdgeInsets.only(left: 35, top: 20, right: 25),
-                    decoration: const BoxDecoration(
-                        color: Color(0xffE7E7E7),
-                        borderRadius: BorderRadius.all(Radius.circular(20))),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Center(
-                          child: Stack(
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.only(top: 20),
-                                height: 150,
-                                width: 250,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(25.0),
-                                  child: Image.network(
-                                    _documents[index]['img'],
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                  top: 25,
-                                  right: 15,
-                                  child: favotiteHotel
-                                      ? Icon(
-                                          Icons.favorite,
-                                          color: Colors.red,
-                                        )
-                                      : Icon(Icons.favorite_border_outlined))
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.only(top: 10),
-                          child: Row(
-                            children: [
-                              SizedBox(
-                                width: 15,
-                              ),
-                              const Icon(
-                                Icons.people_outline,
-                                color: Colors.blue,
-                              ),
-                              const SizedBox(
-                                width: 15,
-                              ),
-                              CustomText(text: _documents[index]['rate']),
-                              Spacer(),
-                              const CustomText(text: '1 спальня 2 человека'),
-                              SizedBox(
-                                width: 15,
-                              )
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.only(left: 15, top: 10),
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  widget.isRec
+                      ? Container(
+                          width: double.infinity,
+                          margin: EdgeInsets.only(left: 25, right: 20, top: 25),
                           child: CustomText(
-                            text: _documents[index]['name'],
-                            align: TextAlign.start,
-                            size: 17,
+                            text:
+                                'Мы подобрали для вас наиболее подходящие варианты в городе ${widget.city}',
                             fontWeight: FontWeight.bold,
+                            size: 23,
+                            align: TextAlign.center,
                           ),
+                        )
+                      : Container(),
+                  SizedBox(
+                    height: 25,
+                  ),
+                  ListView.builder(
+                    padding: const EdgeInsets.all(10),
+                    controller: _controller,
+                    shrinkWrap: true,
+                    itemCount: _documents.length + (_isFetchingMore ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index == _documents.length) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      printDocumentIds();
+                      final bool favotiteHotel = _documents[index]['like'];
+                      getPriceForPeople(
+                        args.days.inDays.toInt() + 1,
+                        int.parse(args.people),
+                        int.parse(
+                          _documents[index]['price'],
                         ),
-                        Container(
-                          margin: const EdgeInsets.only(left: 15, top: 10),
+                      );
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/apartment',
+                              arguments: ApartmentDataView(
+                                _documents[index],
+                                _docId[index],
+                                priceList[index],
+                                args.people,
+                                args.days,
+                              ));
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 300,
+                          margin: const EdgeInsets.only(
+                              left: 35, top: 20, right: 25),
+                          decoration: const BoxDecoration(
+                              color: Color(0xffE7E7E7),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20))),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              CustomText(
-                                text: ('$roundPrice ₽').toString(),
-                                align: TextAlign.start,
-                                size: 13,
+                              Center(
+                                child: Stack(
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 20),
+                                      height: 150,
+                                      width: 250,
+                                      child: ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(25.0),
+                                        child: Image.network(
+                                          _documents[index]['img'],
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                        top: 25,
+                                        right: 15,
+                                        child: favotiteHotel
+                                            ? Icon(
+                                                Icons.favorite,
+                                                color: Colors.red,
+                                              )
+                                            : Icon(
+                                                Icons.favorite_border_outlined))
+                                  ],
+                                ),
                               ),
-                              const SizedBox(
-                                height: 5,
+                              Container(
+                                margin: const EdgeInsets.only(top: 10),
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 15,
+                                    ),
+                                    const Icon(
+                                      Icons.people_outline,
+                                      color: Colors.blue,
+                                    ),
+                                    const SizedBox(
+                                      width: 15,
+                                    ),
+                                    CustomText(text: _documents[index]['rate']),
+                                    Spacer(),
+                                    const CustomText(
+                                        text: '1 спальня 2 человека'),
+                                    SizedBox(
+                                      width: 15,
+                                    )
+                                  ],
+                                ),
                               ),
-                              CustomText(
-                                  text:
-                                      "За ${args.days.inDays + 1} ночей и ${args.people} гостей")
+                              Container(
+                                margin:
+                                    const EdgeInsets.only(left: 15, top: 10),
+                                child: CustomText(
+                                  text: _documents[index]['name'],
+                                  align: TextAlign.start,
+                                  size: 17,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Container(
+                                margin:
+                                    const EdgeInsets.only(left: 15, top: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CustomText(
+                                      text: ('$roundPrice ₽').toString(),
+                                      align: TextAlign.start,
+                                      size: 13,
+                                    ),
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    CustomText(
+                                        text:
+                                            "За ${args.days.inDays + 1} ночей и ${args.people} гостей")
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
+                ],
+              ),
             ),
     );
   }

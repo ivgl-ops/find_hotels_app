@@ -15,7 +15,7 @@ class ApartmentView extends StatefulWidget {
 class _ApartmentViewState extends State<ApartmentView> {
   bool? fav;
   late final args;
-  Map<String, dynamic> list = {};
+   dynamic list = {};
 
   @override
   void initState() {
@@ -72,7 +72,7 @@ class _ApartmentViewState extends State<ApartmentView> {
     updateFavoriteField(documentId, newValue);
 
     // Reload the data from Firebase
-    searchfromFirebase("");
+
     setState(() {});
   }
 
@@ -107,6 +107,7 @@ class _ApartmentViewState extends State<ApartmentView> {
             SizedBox(
               height: 25,
             ),
+
             SizedBox(
               width: double.infinity,
               height: 240,
@@ -129,7 +130,8 @@ class _ApartmentViewState extends State<ApartmentView> {
                 fav == true
                     ? IconButton(
                         onPressed: () async {
-                          onFavoriteButtonPressed(list['id'], list['like']);
+                          print(args.id);
+                          onFavoriteButtonPressed(args.id, list['like']);
                           fav = false;
                           setState(() {});
                         },
@@ -139,7 +141,8 @@ class _ApartmentViewState extends State<ApartmentView> {
                         ))
                     : IconButton(
                         onPressed: () async {
-                          onFavoriteButtonPressed(list['id'], list['like']);
+                          print(args.id);
+                          onFavoriteButtonPressed(args.id, list['like']);
                           fav = true;
                           setState(() {});
                         },

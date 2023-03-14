@@ -236,7 +236,7 @@ class _MainViewState extends State<MainView> {
                           width: 190,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 10),
-                          margin: const EdgeInsets.only(left: 20, top: 20),
+                          margin: const EdgeInsets.only(left: 10, top: 20),
                           decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius:
@@ -280,7 +280,12 @@ class _MainViewState extends State<MainView> {
               height: 200,
               width: double.infinity,
               decoration: BoxDecoration(
-                  color: Colors.amber, borderRadius: BorderRadius.circular(25)),
+                  gradient: LinearGradient(
+                    colors: [Color(0xffFF001F),Color(0xff007AFF),],
+                    begin: Alignment.bottomLeft,
+                    end: Alignment.topRight,
+                  ),
+                  borderRadius: BorderRadius.circular(25)),
               child: Column(
                 children: [
                   SizedBox(
@@ -301,7 +306,7 @@ class _MainViewState extends State<MainView> {
                   ),
                   Spacer(),
                   GestureDetector(
-                    onTap: (){
+                    onTap: () {
                       Navigator.pushNamed(context, '/question');
                     },
                     child: Container(
@@ -311,10 +316,10 @@ class _MainViewState extends State<MainView> {
                       color: Colors.lightBlue,
                       child: Center(
                           child: CustomText(
-                            size: 20,
+                        size: 20,
                         text: 'Подобрать отель',
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       )),
                     ),
                   ),
