@@ -13,9 +13,9 @@ dependencies:
   flutter:
     sdk: flutter
 
-
   cupertino_icons: ^1.0.2
   provider: ^6.0.5
+  flutter_local_notifications: ^9.7.0
   shared_preferences: ^2.0.17
   google_fonts: ^4.0.0
   firebase_core: ^2.4.1
@@ -25,10 +25,12 @@ dependencies:
   unicons: ^2.1.0
   flutter_localizations:
     sdk: flutter
-  
+  mask_text_input_formatter: ^2.4.0
+
+
 flutter_localizations:
-    sdk: flutter  
-    
+  sdk: flutter
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

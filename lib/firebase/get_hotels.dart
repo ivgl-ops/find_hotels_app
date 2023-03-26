@@ -4,9 +4,14 @@ import 'package:flutter/cupertino.dart';
 class GetHotel extends ChangeNotifier {
   CollectionReference hotel = FirebaseFirestore.instance.collection('hotels');
   CollectionReference offer = FirebaseFirestore.instance.collection('Offer');
+  String nameHotels = 'Москва';
   String getHotels = 'rate';
   bool maxtoMinRate = true;
 
+  void setNameHotels(name){
+    nameHotels = name;
+    notifyListeners();
+  }
   void changeRateMin() {
     getHotels = 'rate';
     maxtoMinRate = false;

@@ -67,9 +67,7 @@ class _FavoriteHotelsViewState extends State<FavoriteHotelsView> {
             } else {
               if (searchResult.isEmpty) {
                 return Center(
-                  child: CustomText(
-                    text: 'У вас нет избранных отелей',
-                  ),
+                  child: CircularProgressIndicator(),
                 );
               }
               return ListView.builder(

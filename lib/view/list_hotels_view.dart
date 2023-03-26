@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 import '../data/apartmentsData.dart';
 import '../data/search_hotels.dart';
+import '../firebase/get_hotels.dart';
 import '../widgets/custom_text.dart';
 
 class ListHotelsView extends StatefulWidget {
@@ -40,9 +42,8 @@ class _ListHotelsViewState extends State<ListHotelsView> {
   final List _docId = [];
 
   @override
-  void initState() {
-    super.initState();
-    _controller.addListener(_scrollListener);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     if (widget.isRec) {
       _fetchDataRec(widget.city, widget.places, widget.level_rooms,
           widget.location_type, widget.budget);
@@ -123,7 +124,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
   void _fetchData() {
     FirebaseFirestore.instance
         .collection('hotels_ru')
-        .orderBy('price')
+        .where('city', isEqualTo: Provider.of<GetHotel>(context).nameHotels)
         .limit(_pageSize)
         .get()
         .then((querySnapshot) {
@@ -138,10 +139,9 @@ class _ListHotelsViewState extends State<ListHotelsView> {
       setState(() {
         _isFetchingMore = true;
       });
-
       FirebaseFirestore.instance
           .collection('hotels_ru')
-          .orderBy('price')
+          .where('city', isEqualTo: Provider.of<GetHotel>(context).nameHotels)
           .startAfterDocument(_documents.last)
           .limit(_pageSize)
           .get()

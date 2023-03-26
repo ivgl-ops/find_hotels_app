@@ -1,11 +1,15 @@
+import 'package:find_hotels_app/data/apartmentsData.dart';
+import 'package:find_hotels_app/data/flexibleData.dart';
 import 'package:find_hotels_app/data/sort.dart';
 import 'package:find_hotels_app/firebase/get_hotels.dart';
+import 'package:find_hotels_app/view/PaymentConfirmation.dart';
 import 'package:find_hotels_app/view/apartmets_view.dart';
 import 'package:find_hotels_app/view/favorite_hotels_view.dart';
 import 'package:find_hotels_app/view/filter_hotels_view.dart';
 import 'package:find_hotels_app/view/list_hotels_view.dart';
 import 'package:find_hotels_app/view/main_view.dart';
 import 'package:find_hotels_app/view/num_person_view.dart';
+import 'package:find_hotels_app/view/payment_view.dart';
 import 'package:find_hotels_app/view/question.dart';
 import 'package:find_hotels_app/view/start_view.dart';
 import 'package:find_hotels_app/viewModel/num_person_viewmodel.dart';
@@ -14,6 +18,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'firebase/firebase_options.dart';
+import 'view/payload_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +35,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => FlexibleData()),
         ChangeNotifierProvider(create: (context) => GetHotel()),
         ChangeNotifierProvider(create: (context) => NumPersonViewModel()),
         ChangeNotifierProvider(create: (context) => Sort())
@@ -49,6 +55,7 @@ class MyApp extends StatelessWidget {
         ],
         title: 'Flutter Demo',
         routes: {
+          '/payment': (context) => const PaymentView(),
           '/num': (context) => const NumPersonView(),
           '/main': (context) => const MainView(),
           '/search': ((context) => ListHotelsView(
@@ -65,6 +72,8 @@ class MyApp extends StatelessWidget {
           '/start': ((context) => StartView(index: 2)),
           '/question': ((context) => QuestionScreen()),
           '/start_menu': ((context) => StartView(index: 0)),
+          '/payload': ((context) => PayloadView()),
+          '/payment_confirmation': ((context) => PaymentConfirmationWidget()),
         },
         home: StartView(
           index: 0,

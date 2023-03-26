@@ -128,7 +128,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
                           margin:
                               EdgeInsets.only(left: 20, right: 20, bottom: 20),
                           height: 50,
-                          decoration: BoxDecoration(color: Colors.blue, borderRadius: BorderRadius.circular(25)),
+                          decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(25)),
                           child: Center(
                             child: CustomText(
                               text: option,
