@@ -124,7 +124,8 @@ class _ListHotelsViewState extends State<ListHotelsView> {
   void _fetchData() {
     FirebaseFirestore.instance
         .collection('hotels_ru')
-        .where('city', isEqualTo: Provider.of<GetHotel>(context).nameHotels)
+        .where('city',
+            isEqualTo: Provider.of<GetHotel>(context, listen: false).nameHotels)
         .limit(_pageSize)
         .get()
         .then((querySnapshot) {
@@ -133,6 +134,22 @@ class _ListHotelsViewState extends State<ListHotelsView> {
       });
     });
   }
+
+  void _reloadData() {
+    FirebaseFirestore.instance
+        .collection('hotels_ru')
+        .where('city',
+        isEqualTo: Provider.of<GetHotel>(context, listen: false).nameHotels)
+        .limit(_pageSize)
+        .get()
+        .then((querySnapshot) {
+      setState(() {
+        _documents.clear();
+        _documents.addAll(querySnapshot.docs.toList());
+      });
+    });
+  }
+
 
   void _loadMore() {
     if (!_isFetchingMore) {
@@ -253,7 +270,7 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                                 priceList[index],
                                 args.people,
                                 args.days,
-                              ));
+                              )).then((_) => _reloadData());
                         },
                         child: Container(
                           width: double.infinity,

@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "668875505484",
-    "project_id": "dimplom-project",
-    "storage_bucket": "dimplom-project.appspot.com"
+    "project_number": "12369001857",
+    "project_id": "diplomchick-33cd4",
+    "storage_bucket": "diplomchick-33cd4.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:668875505484:android:1007df001386e9bc9699e9",
+        "mobilesdk_app_id": "1:12369001857:android:a4c8744f39c816731e3c80",
         "android_client_info": {
           "package_name": "com.example.find_hotels_app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "668875505484-souj1ifbfeh5c92h89cv9ogo6pfda6a8.apps.googleusercontent.com",
+          "client_id": "12369001857-27jhuib9kbaf7u5ckecslmup5j67gk1i.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDSNuFW0SizcBW0-wr5Y_j7dMYuc74GL90"
+          "current_key": "AIzaSyBMLPMV1ENImh9tD-CYgVStl3gTPOaIghs"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "668875505484-souj1ifbfeh5c92h89cv9ogo6pfda6a8.apps.googleusercontent.com",
+              "client_id": "12369001857-27jhuib9kbaf7u5ckecslmup5j67gk1i.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

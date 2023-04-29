@@ -18,8 +18,8 @@ class _AddDataViewState extends State<AddDataView> {
     List<String> budget = ['Дешевый', 'Средний', 'Дорогой'];
     List<String> city = [
       'Москва',
-      'Санкт-Петербург',
-      'Краснодар',
+      'Новосибирск',
+      'Сочи',
       'Красноярск',
       'Владивосток',
     ];
@@ -81,7 +81,7 @@ class _AddDataViewState extends State<AddDataView> {
     Random random = Random();
 
     // Создаем 100 документов в коллекции
-    for (int i = 0; i < 2000; i++) {
+    for (int i = 0; i < 500; i++) {
 
       int price = random.nextInt(4501) + 500;
       String budget = "";

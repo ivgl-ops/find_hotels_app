@@ -23,6 +23,7 @@ import 'view/payload_view.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
+    name: 'diplomchick-33cd4',
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(const MyApp());
