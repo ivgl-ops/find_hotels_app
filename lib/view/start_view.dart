@@ -1,4 +1,5 @@
 import 'package:find_hotels_app/view/main_view.dart';
+import 'package:find_hotels_app/view/screen_paid.dart';
 import 'package:flutter/material.dart';
 
 import 'favorite_hotels_view.dart';
@@ -20,10 +21,7 @@ import 'favorite_hotels_view.dart';
     static const List<Widget> _widgetOptions = <Widget>[
       MainView(),
       FavoriteHotelsView(),
-      Text(
-        'Index 2: School',
-        style: optionStyle,
-      ),
+      ScreenPaid(),
       Text(
         'Index 3: Settings',
         style: optionStyle,

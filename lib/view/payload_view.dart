@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_hotels_app/data/apartmentsData.dart';
 import 'package:find_hotels_app/data/flexibleData.dart';
 import 'package:find_hotels_app/widgets/custom_text.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
@@ -57,6 +59,26 @@ class _PayloadViewState extends State<PayloadView> {
     });
   }
 
+  Future<void> updateFavoriteField(String documentId, bool newValue) async {
+    try {
+      // Get a reference to the document to update
+      final documentReference =
+      FirebaseFirestore.instance.collection('hotels_ru').doc(documentId);
+
+      // Update the 'favorite' field
+      await documentReference.update({'pay': newValue});
+
+      if (kDebugMode) {
+        print('Favorite field updated successfully!');
+      }
+
+    } catch (error) {
+      if (kDebugMode) {
+        print('Error updating favorite field: $error');
+      }
+    }
+  }
+
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -74,6 +96,9 @@ class _PayloadViewState extends State<PayloadView> {
       // Insert a space after every 4 digits
       _CardNumberTextInputFormatter(),
     ];
+
+    var args = ModalRoute.of(context)!.settings.arguments as ApartmentDataView;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -124,8 +149,7 @@ class _PayloadViewState extends State<PayloadView> {
             child: ElevatedButton(
                 onPressed: () {
                   dynamic list =
-                      Provider.of<FlexibleData>(context, listen: false)
-                          .list;
+                      Provider.of<FlexibleData>(context, listen: false).list;
                   String cardNumber =
                       _cardNumberController.text.replaceAll(" ", "");
                   String cardDate =
@@ -143,8 +167,19 @@ class _PayloadViewState extends State<PayloadView> {
                     notify.sendNotify(
                         "Добро пожаловать в ${list['name'].toString().toLowerCase()}",
                         "Спасибо за оплату! Мы ждем вас с нетерпением. Приятного отдыха!");
+                    updateFavoriteField(args.id, true);
+                    print(args.id);
                     Navigator.pushReplacementNamed(
-                        context, '/payment_confirmation');
+                      context,
+                      '/payment_confirmation',
+                      arguments: ApartmentDataView(
+                        args.searchResult,
+                        args.id,
+                        args.price,
+                        args.people,
+                        args.days,
+                      ),
+                    );
                   }
                 },
                 child: CustomText(text: 'Продолжить оплату')),
@@ -156,6 +191,12 @@ class _PayloadViewState extends State<PayloadView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            CustomText(
+              text: 'Оплата',
+              size: 24,
+            ),
+            SizedBox(height: 20),
+            CustomText(text: args.price.toString() + " ₽", size: 24),
             Container(
               decoration: BoxDecoration(
                   color: Colors.grey[200],

@@ -339,7 +339,17 @@ class _ApartmentViewState extends State<ApartmentView> {
           child: GestureDetector(
             onTap: () {
               Provider.of<FlexibleData>(context, listen: false).setList(list);
-              Navigator.pushNamed(context, '/payment');
+              Navigator.pushNamed(
+                context,
+                '/payment',
+                arguments: ApartmentDataView(
+                  args.searchResult,
+                  args.id,
+                  args.price,
+                  args.people,
+                  args.days,
+                ),
+              );
             },
             child: Container(
               height: 60,

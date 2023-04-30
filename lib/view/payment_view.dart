@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../data/apartmentsData.dart';
 import '../widgets/custom_text.dart';
 
 class PaymentView extends StatefulWidget {
@@ -26,6 +27,8 @@ class _PaymentViewState extends State<PaymentView> {
 
   @override
   Widget build(BuildContext context) {
+    var args = ModalRoute.of(context)!.settings.arguments as ApartmentDataView;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
@@ -71,7 +74,20 @@ class _PaymentViewState extends State<PaymentView> {
       ),
       floatingActionButton: GestureDetector(
         onTap: () {
-          Navigator.pushNamed(context, '/payload');
+          Navigator.pushNamed(
+            context,
+            '/payload',
+            arguments: ApartmentDataView(
+              args.searchResult,
+              args.id,
+              args.price,
+              args.people,
+              args.days,
+            ),
+          );
+
+          print(
+              'addd ${args.id}, ${args.price}, ${args.people}, ${args.days}, ${args.searchResult}');
         },
         child: Container(
           height: 105,
@@ -100,7 +116,17 @@ class _PaymentViewState extends State<PaymentView> {
             color: Colors.blue,
             child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/payload');
+                  Navigator.pushNamed(
+                    context,
+                    '/payload',
+                    arguments: ApartmentDataView(
+                      args.searchResult,
+                      args.id,
+                      args.price,
+                      args.people,
+                      args.days,
+                    ),
+                  );
                 },
                 child: CustomText(text: 'Продолжить оплату')),
           ),
