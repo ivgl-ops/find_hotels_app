@@ -254,7 +254,7 @@ class _ApartmentViewState extends State<ApartmentView> {
                             width: 20,
                           ),
                           Icon(
-                            Icons.people_outline,
+                            Icons.star,
                             color: Colors.blue,
                           ),
                           SizedBox(

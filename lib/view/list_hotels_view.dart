@@ -321,13 +321,13 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                                       width: 15,
                                     ),
                                     const Icon(
-                                      Icons.people_outline,
+                                      Icons.star,
                                       color: Colors.blue,
                                     ),
                                     const SizedBox(
-                                      width: 15,
+                                      width: 5,
                                     ),
-                                    CustomText(text: _documents[index]['rate']),
+                                    CustomText(text: '${_documents[index]['rate']} /  10'),
                                     Spacer(),
                                     const CustomText(
                                         text: '1 спальня 2 человека'),

@@ -12,6 +12,7 @@ class QuestionScreen extends StatefulWidget {
 class _QuestionScreenState extends State<QuestionScreen> {
   int _currentQuestionIndex = 0;
   List search = [];
+  bool notFound = false;
 
   void searchfromFirebase(
     String city,
@@ -39,19 +40,24 @@ class _QuestionScreenState extends State<QuestionScreen> {
       print('count ${search.length}');
     });
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => ListHotelsView(
+      if (search.length > 0) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ListHotelsView(
               isRec: true,
               city: city,
               places: places,
               level_rooms: level_rooms,
               location_type: location_type,
-              budget: budget)),
-    );
-
-    print(search);
+              budget: budget,
+            ),
+          ),
+        );
+      } else {
+        notFound = true;
+        setState(() {});
+      }
   }
 
   final List<Map<String, dynamic>> _questions = [
@@ -100,64 +106,72 @@ class _QuestionScreenState extends State<QuestionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Вопросы'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 20),
-              child: Center(
-                child: CustomText(
-                  text: _questions[_currentQuestionIndex]['question'],
-                  size: 25,
-                  fontWeight: FontWeight.bold,
-                  align: TextAlign.center,
-                  maxLines: 2,
-                ),
-              ),
-            ),
-            SizedBox(height: 50),
-            Column(
-              children: _questions[_currentQuestionIndex]['options']
-                  .map<Widget>((option) => GestureDetector(
-                        child: Container(
-                          width: double.infinity,
-                          margin:
-                              EdgeInsets.only(left: 20, right: 20, bottom: 20),
-                          height: 50,
-                          decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(25)),
-                          child: Center(
-                            child: CustomText(
-                              text: option,
-                              size: 17,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              align: TextAlign.center,
-                              maxLines: 2,
-                            ),
-                          ),
-                        ),
-                        onTap: () {
-                          // Сохранить ответ пользователя на вопрос
-                          _answers.add({
-                            'question': _questions[_currentQuestionIndex]
-                                ['question'],
-                            'answer': option
-                          });
-                          _goToNextQuestion();
-                        },
-                      ))
-                  .toList(),
-            ),
-          ],
+        appBar: AppBar(
+          title: !notFound
+              ? CustomText(text: 'Вопросы',)
+              : CustomText(text: 'Рекомендации'),
         ),
-      ),
-    );
+        body: !notFound
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 20),
+                      child: Center(
+                        child: CustomText(
+                          text: _questions[_currentQuestionIndex]['question'],
+                          size: 25,
+                          fontWeight: FontWeight.bold,
+                          align: TextAlign.center,
+                          maxLines: 2,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 50),
+                    Column(
+                      children: _questions[_currentQuestionIndex]['options']
+                          .map<Widget>((option) => GestureDetector(
+                                child: Container(
+                                  width: double.infinity,
+                                  margin: EdgeInsets.only(
+                                      left: 20, right: 20, bottom: 20),
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                      color: Colors.blue,
+                                      borderRadius: BorderRadius.circular(25)),
+                                  child: Center(
+                                    child: CustomText(
+                                      text: option,
+                                      size: 17,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      align: TextAlign.center,
+                                      maxLines: 2,
+                                    ),
+                                  ),
+                                ),
+                                onTap: () {
+                                  // Сохранить ответ пользователя на вопрос
+                                  _answers.add({
+                                    'question':
+                                        _questions[_currentQuestionIndex]
+                                            ['question'],
+                                    'answer': option
+                                  });
+                                  _goToNextQuestion();
+                                },
+                              ))
+                          .toList(),
+                    ),
+                  ],
+                ),
+              )
+            : Center(
+                child: CustomText(
+                  text: 'По вашему запросу нет аппартаментов',
+                ),
+              ));
   }
 
   void _goToNextQuestion() {

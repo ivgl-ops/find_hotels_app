@@ -75,120 +75,138 @@ class _FavoriteHotelsViewState extends State<FavoriteHotelsView> {
             color: Colors.blue,
           ),
         ),
-        body: ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(10),
-          itemCount: searchResult.length,
-          shrinkWrap: true,
-          itemBuilder: (context, index) {
-            final bool favoriteHotel = searchResult[index]['like'];
-            printDocumentIds();
-            return GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  '/apartment',
-                  arguments: ApartmentDataView(
-                    searchResult[index],
-                    _docId[index],
-                    int.parse(searchResult[index]['price']),
-                    '2',
-                    Duration(days: 2),
-                  ),
-                ).then((_) => _reloadData());
-              },
-              child: Container(
-                width: double.infinity,
-                height: 300,
-                margin: const EdgeInsets.only(left: 35, top: 20, right: 25),
-                decoration: const BoxDecoration(
-                    color: Color(0xffE7E7E7),
-                    borderRadius: BorderRadius.all(Radius.circular(20))),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Stack(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 20),
-                            height: 150,
-                            width: 250,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(25.0),
-                              child: Image.network(
-                                searchResult[index]['img'],
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                              top: 25,
-                              right: 15,
-                              child: favoriteHotel
-                                  ? Icon(
-                                      Icons.favorite,
-                                      color: Colors.red,
-                                    )
-                                  : Icon(Icons.favorite_border_outlined))
-                        ],
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 10),
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            width: 15,
-                          ),
-                          const Icon(
-                            Icons.people_outline,
-                            color: Colors.blue,
-                          ),
-                          const SizedBox(
-                            width: 15,
-                          ),
-                          CustomText(text: searchResult[index]['rate']),
-                          Spacer(),
-                          const CustomText(text: '1 спальня 2 человека'),
-                          SizedBox(
-                            width: 15,
-                          )
-                        ],
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(left: 15, top: 10),
+        body: searchResult.length == 0
+            ? FutureBuilder(
+                future: Future.delayed(Duration(milliseconds: 1500)),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else {
+                    return Center(
                       child: CustomText(
-                        text: searchResult[index]['name'],
-                        align: TextAlign.start,
-                        size: 17,
-                        fontWeight: FontWeight.bold,
+                        text: 'У вас пока нет избранных отелей',
                       ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(left: 15, top: 10),
+                    );
+                  }
+                },
+              )
+            : ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(10),
+                itemCount: searchResult.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  final bool favoriteHotel = searchResult[index]['like'];
+                  printDocumentIds();
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/apartment',
+                        arguments: ApartmentDataView(
+                          searchResult[index],
+                          _docId[index],
+                          int.parse(searchResult[index]['price']),
+                          '2',
+                          Duration(days: 2),
+                        ),
+                      ).then((_) => _reloadData());
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      height: 300,
+                      margin:
+                          const EdgeInsets.only(left: 35, top: 20, right: 25),
+                      decoration: const BoxDecoration(
+                          color: Color(0xffE7E7E7),
+                          borderRadius: BorderRadius.all(Radius.circular(20))),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CustomText(
-                            text: ('${searchResult[index]['price']} ₽')
-                                .toString(),
-                            align: TextAlign.start,
-                            size: 13,
+                          Center(
+                            child: Stack(
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.only(top: 20),
+                                  height: 150,
+                                  width: 250,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(25.0),
+                                    child: Image.network(
+                                      searchResult[index]['img'],
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                    top: 25,
+                                    right: 15,
+                                    child: favoriteHotel
+                                        ? Icon(
+                                            Icons.favorite,
+                                            color: Colors.red,
+                                          )
+                                        : Icon(Icons.favorite_border_outlined))
+                              ],
+                            ),
                           ),
-                          const SizedBox(
-                            height: 5,
+                          Container(
+                            margin: const EdgeInsets.only(top: 10),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 15,
+                                ),
+                                const Icon(
+                                  Icons.people_outline,
+                                  color: Colors.blue,
+                                ),
+                                const SizedBox(
+                                  width: 15,
+                                ),
+                                CustomText(text: searchResult[index]['rate']),
+                                Spacer(),
+                                const CustomText(text: '1 спальня 2 человека'),
+                                SizedBox(
+                                  width: 15,
+                                )
+                              ],
+                            ),
                           ),
-                          CustomText(text: "За 2-х гостей")
+                          Container(
+                            margin: const EdgeInsets.only(left: 15, top: 10),
+                            child: CustomText(
+                              text: searchResult[index]['name'],
+                              align: TextAlign.start,
+                              size: 17,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(left: 15, top: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CustomText(
+                                  text: ('${searchResult[index]['price']} ₽')
+                                      .toString(),
+                                  align: TextAlign.start,
+                                  size: 13,
+                                ),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                CustomText(text: "За 2-х гостей")
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ));
+                  );
+                },
+              ));
   }
 }

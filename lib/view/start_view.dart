@@ -33,6 +33,7 @@ import 'favorite_hotels_view.dart';
         _selectedIndex = index;
       });
     }
+
     @override
     void initState() {
       super.initState();

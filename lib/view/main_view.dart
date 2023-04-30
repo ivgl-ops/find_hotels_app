@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_hotels_app/data/search_hotels.dart';
 import 'package:find_hotels_app/viewModel/num_person_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -43,6 +44,7 @@ class _MainViewState extends State<MainView>
   void dispose() {
     super.dispose();
     cityController.dispose();
+    _controller.dispose();
   }
 
   Future pickDateRange() async {
@@ -107,59 +109,81 @@ class _MainViewState extends State<MainView>
                             ),
                           ),
                           Container(
-                            margin: const EdgeInsets.only(
-                                top: 30, left: 30, right: 30),
-                            height: 40,
-                            child: TextField(
-                              controller: cityController,
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: Colors.white,
-                                contentPadding: const EdgeInsets.only(left: 15),
-                                hintText: 'Москва',
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    width: 5, //<-- SEE HERE
-                                    color: Colors.white,
+                              margin: const EdgeInsets.only(
+                                  top: 30, left: 30, right: 30),
+                              height: 40,
+                              child: TypeAheadField(
+                                textFieldConfiguration: TextFieldConfiguration(
+                                  controller: cityController,
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: Colors.white,
+                                    contentPadding:
+                                        const EdgeInsets.only(left: 15),
+                                    hintText: 'Москва',
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: const BorderSide(
+                                        width: 5, //<-- SEE HERE
+                                        color: Colors.white,
+                                      ),
+                                      borderRadius: BorderRadius.circular(50.0),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: const BorderSide(
+                                        width: 5, //<-- SEE HERE
+                                        color: Colors.white,
+                                      ),
+                                      borderRadius: BorderRadius.circular(50.0),
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: const Icon(Icons.search),
+                                      onPressed: () {
+                                        FocusScope.of(context).unfocus();
+                                        String nameHotels =
+                                            removeExtraCharacters(
+                                                cityController.text);
+                                        Provider.of<GetHotel>(context,
+                                                listen: false)
+                                            .setNameHotels(nameHotels);
+                                        Navigator.pushNamed(
+                                          context,
+                                          '/search',
+                                          arguments: SearchHotels(
+                                              start,
+                                              end,
+                                              removeExtraCharacters(
+                                                  cityController.text),
+                                              Provider.of<NumPersonViewModel>(
+                                                      context,
+                                                      listen: false)
+                                                  .total
+                                                  .toString(),
+                                              days),
+                                        );
+                                      },
+                                    ),
                                   ),
-                                  borderRadius: BorderRadius.circular(50.0),
                                 ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                    width: 5, //<-- SEE HERE
-                                    color: Colors.white,
-                                  ),
-                                  borderRadius: BorderRadius.circular(50.0),
-                                ),
-                                suffixIcon: IconButton(
-                                  icon: const Icon(Icons.search),
-                                  onPressed: () {
-                                    FocusScope.of(context).unfocus();
-                                    String nameHotels = removeExtraCharacters(
-                                        cityController.text);
-                                    Provider.of<GetHotel>(context,
-                                            listen: false)
-                                        .setNameHotels(nameHotels);
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/search',
-                                      arguments: SearchHotels(
-                                          start,
-                                          end,
-                                          removeExtraCharacters(
-                                              cityController.text),
-                                          Provider.of<NumPersonViewModel>(
-                                                  context,
-                                                  listen: false)
-                                              .total
-                                              .toString(),
-                                          days),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
+                                suggestionsCallback: (pattern) async {
+                                  List<String> suggestions = [
+                                    'Сочи',
+                                    'Новосибирск',
+                                    'Москва'
+                                  ];
+                                  return suggestions.where((suggestion) =>
+                                      suggestion
+                                          .toLowerCase()
+                                          .contains(pattern.toLowerCase()));
+                                },
+                                itemBuilder: (context, suggestion) {
+                                  return ListTile(
+                                    title: Text(suggestion),
+                                  );
+                                },
+                                onSuggestionSelected: (suggestion) {
+                                  cityController.text = suggestion;
+                                },
+                              )),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [

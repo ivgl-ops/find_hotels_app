@@ -7,10 +7,11 @@ class ApartmentDataView extends ChangeNotifier {
   final String people;
   final Duration days;
   dynamic list;
-  
+
   void setList(dynamic dataList){
     list = dataList;
   }
+
   ApartmentDataView(
        this.searchResult,this.id, this.price, this.people, this.days);
 }

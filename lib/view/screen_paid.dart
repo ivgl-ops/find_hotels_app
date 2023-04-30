@@ -73,11 +73,22 @@ class _ScreenPaidState extends State<ScreenPaid> {
           child: Column(
             children: [
               searchResult.isEmpty
-                  ? Center(
+                  ? FutureBuilder(
+                future: Future.delayed(Duration(seconds: 3)),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else {
+                    return Center(
                       child: CustomText(
-                        text: 'У вас пока нет оплаченных аппартаментов',
+                        text: 'Пока что у вас нет оплаченных отелей',
                       ),
-                    )
+                    );
+                  }
+                },
+              )
                   : ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(10),
