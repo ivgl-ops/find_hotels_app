@@ -29,6 +29,13 @@
             {
               "client_id": "12369001857-27jhuib9kbaf7u5ckecslmup5j67gk1i.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "12369001857-109flkgdrubu1evg9i9en2tmg9m74pum.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.findHotelsApp"
+              }
             }
           ]
         }

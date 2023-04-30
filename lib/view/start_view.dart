@@ -1,5 +1,7 @@
 import 'package:find_hotels_app/view/main_view.dart';
 import 'package:find_hotels_app/view/screen_paid.dart';
+import 'package:find_hotels_app/view/screen_user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'favorite_hotels_view.dart';
@@ -14,18 +16,16 @@ import 'favorite_hotels_view.dart';
   }
 
   class StartViewState extends State<StartView> {
+
     int _selectedIndex = 0;
     static const TextStyle optionStyle =
         TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
-    static const List<Widget> _widgetOptions = <Widget>[
+    static  final List<Widget> _widgetOptions = <Widget>[
       MainView(),
       FavoriteHotelsView(),
       ScreenPaid(),
-      Text(
-        'Index 3: Settings',
-        style: optionStyle,
-      ),
+      ScreenUser()
     ];
 
     void _onItemTapped(int index) {

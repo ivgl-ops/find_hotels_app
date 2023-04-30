@@ -26,6 +26,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   mask_text_input_formatter: ^2.4.0
+  firebase_auth: ^4.0.2
+  email_validator: ^2.1.17
 
 
 flutter_localizations:

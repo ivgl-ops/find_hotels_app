@@ -2,6 +2,13 @@ import 'package:find_hotels_app/data/apartmentsData.dart';
 import 'package:find_hotels_app/data/flexibleData.dart';
 import 'package:find_hotels_app/data/sort.dart';
 import 'package:find_hotels_app/firebase/get_hotels.dart';
+import 'package:find_hotels_app/screens/account_screen.dart';
+import 'package:find_hotels_app/screens/home_screen.dart';
+import 'package:find_hotels_app/screens/login_screen.dart';
+import 'package:find_hotels_app/screens/reset_password_screen.dart';
+import 'package:find_hotels_app/screens/signup_screen.dart';
+import 'package:find_hotels_app/screens/verify_email_screen.dart';
+import 'package:find_hotels_app/services/firebase_streem.dart';
 import 'package:find_hotels_app/view/PaymentConfirmation.dart';
 import 'package:find_hotels_app/view/apartmets_view.dart';
 import 'package:find_hotels_app/view/favorite_hotels_view.dart';
@@ -75,10 +82,15 @@ class MyApp extends StatelessWidget {
           '/start_menu': ((context) => StartView(index: 0)),
           '/payload': ((context) => PayloadView()),
           '/payment_confirmation': ((context) => PaymentConfirmationWidget()),
+          '/': (context) => const FirebaseStream(),
+          '/home': (context) => const HomeScreen(),
+          '/account': (context) => const AccountScreen(),
+          '/login': (context) => const LoginScreen(),
+          '/signup': (context) => const SignUpScreen(),
+          '/reset_password': (context) => const ResetPasswordScreen(),
+          '/verify_email': (context) => const VerifyEmailScreen(),
         },
-        home: StartView(
-          index: 0,
-        ),
+        initialRoute: '/',
       ),
     );
   }
