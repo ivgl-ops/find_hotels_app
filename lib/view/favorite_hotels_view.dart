@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_hotels_app/data/apartmentsData.dart';
 import 'package:find_hotels_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import 'package:provider/provider.dart';
 
@@ -81,7 +82,10 @@ class _FavoriteHotelsViewState extends State<FavoriteHotelsView> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(
-                      child: CircularProgressIndicator(),
+                      child: LoadingAnimationWidget.prograssiveDots(
+                        color: Colors.blue,
+                        size: 75,
+                      ),
                     );
                   } else {
                     return Center(

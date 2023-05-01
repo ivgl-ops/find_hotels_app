@@ -29,6 +29,7 @@ dependencies:
   firebase_auth: ^4.0.2
   email_validator: ^2.1.17
   flutter_typeahead: ^4.3.7
+  loading_animation_widget: ^1.2.0+4
 
 
 flutter_localizations:

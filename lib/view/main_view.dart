@@ -5,6 +5,7 @@ import 'package:find_hotels_app/viewModel/num_person_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../firebase/get_hotels.dart';
@@ -273,8 +274,11 @@ class _MainViewState extends State<MainView>
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
+                  return Center(
+                    child: LoadingAnimationWidget.prograssiveDots(
+                      color: Colors.blue,
+                      size: 75,
+                    ),
                   );
                 } else {
                   return SizedBox(

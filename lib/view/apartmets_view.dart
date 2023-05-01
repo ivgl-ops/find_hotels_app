@@ -3,6 +3,7 @@ import 'package:find_hotels_app/data/apartmentsData.dart';
 import 'package:find_hotels_app/firebase/notify.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../data/flexibleData.dart';
@@ -333,7 +334,7 @@ class _ApartmentViewState extends State<ApartmentView> {
           ),
         ),
         Positioned(
-          bottom: 16,
+          bottom: 30,
           left: 10,
           right: 10,
           child: GestureDetector(
@@ -366,11 +367,16 @@ class _ApartmentViewState extends State<ApartmentView> {
                 borderRadius: BorderRadius.circular(25),
               ),
               child: Center(
-                child: CustomText(
-                  text: 'Забронировать отель'.toUpperCase(),
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  size: 17,
+                child: DefaultTextStyle(
+                  style: GoogleFonts.montserrat(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    decoration: TextDecoration.none,
+                  ),
+                  child: Text(
+                    'Забронировать отель'.toUpperCase(),
+                  ),
                 ),
               ),
             ),

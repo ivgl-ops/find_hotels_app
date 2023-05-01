@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../data/apartmentsData.dart';
@@ -220,7 +221,10 @@ class _ListHotelsViewState extends State<ListHotelsView> {
       ),
       body: _documents.isEmpty
           ? Center(
-              child: CircularProgressIndicator(),
+              child: LoadingAnimationWidget.prograssiveDots(
+                color: Colors.blue,
+                size: 75,
+              ),
             )
           : SingleChildScrollView(
               child: Column(
@@ -249,7 +253,10 @@ class _ListHotelsViewState extends State<ListHotelsView> {
                     itemBuilder: (context, index) {
                       if (index == _documents.length) {
                         return Center(
-                          child: CircularProgressIndicator(),
+                          child: LoadingAnimationWidget.prograssiveDots(
+                            color: Colors.blue,
+                            size: 75,
+                          ),
                         );
                       }
                       printDocumentIds();
