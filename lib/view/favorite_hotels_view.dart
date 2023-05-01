@@ -4,10 +4,6 @@ import 'package:find_hotels_app/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
-import 'package:provider/provider.dart';
-
-import '../firebase/get_hotels.dart';
-
 class FavoriteHotelsView extends StatefulWidget {
   const FavoriteHotelsView({super.key});
 
@@ -60,11 +56,6 @@ class _FavoriteHotelsViewState extends State<FavoriteHotelsView> {
 
   @override
   Widget build(BuildContext context) {
-    final Query<Map<String, dynamic>> place = FirebaseFirestore.instance
-        .collection('hotels_ru')
-        .orderBy(context.watch<GetHotel>().getHotels,
-            descending: context.watch<GetHotel>().maxtoMinRate);
-
     return Scaffold(
         appBar: AppBar(
           elevation: 0.0,
@@ -76,7 +67,7 @@ class _FavoriteHotelsViewState extends State<FavoriteHotelsView> {
             color: Colors.blue,
           ),
         ),
-        body: searchResult.length == 0
+        body: searchResult.isEmpty
             ? FutureBuilder(
                 future: Future.delayed(Duration(milliseconds: 1500)),
                 builder: (context, snapshot) {

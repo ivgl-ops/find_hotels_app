@@ -1,5 +1,6 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../services/snack_bar.dart';
@@ -56,7 +57,9 @@ class _SignUpScreen extends State<SignUpScreen> {
         password: passwordTextInputController.text.trim(),
       );
     } on FirebaseAuthException catch (e) {
-      print(e.code);
+      if (kDebugMode) {
+        print(e.code);
+      }
 
       if (e.code == 'email-already-in-use') {
         SnackBarService.showSnackBar(

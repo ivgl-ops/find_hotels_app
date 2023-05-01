@@ -11,8 +11,8 @@ import '../widgets/custom_text.dart';
 class ListHotelsView extends StatefulWidget {
   final String city;
   final String places;
-  final String level_rooms;
-  final String location_type;
+  final String levelRooms;
+  final String locationType;
   final String budget;
   final bool isRec;
 
@@ -21,15 +21,15 @@ class ListHotelsView extends StatefulWidget {
       required this.isRec,
       required this.city,
       required this.places,
-      required this.level_rooms,
-      required this.location_type,
+      required this.levelRooms,
+      required this.locationType,
       required this.budget});
 
   @override
-  _ListHotelsViewState createState() => _ListHotelsViewState();
+  ListHotelsViewState createState() => ListHotelsViewState();
 }
 
-class _ListHotelsViewState extends State<ListHotelsView> {
+class ListHotelsViewState extends State<ListHotelsView> {
   int roundPrice = 0;
   List<int> priceList = [];
   List searchResult = [];
@@ -46,8 +46,8 @@ class _ListHotelsViewState extends State<ListHotelsView> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (widget.isRec) {
-      _fetchDataRec(widget.city, widget.places, widget.level_rooms,
-          widget.location_type, widget.budget);
+      _fetchDataRec(widget.city, widget.places, widget.levelRooms,
+          widget.locationType, widget.budget);
     } else {
       _fetchData();
     }
@@ -63,22 +63,22 @@ class _ListHotelsViewState extends State<ListHotelsView> {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
         !_controller.position.outOfRange) {
       if (widget.isRec) {
-        _loadMoreRec(widget.city, widget.places, widget.level_rooms,
-            widget.location_type, widget.budget);
+        _loadMoreRec(widget.city, widget.places, widget.levelRooms,
+            widget.locationType, widget.budget);
       } else {
         _loadMore();
       }
     }
   }
 
-  void _fetchDataRec(String city, String places, String level_rooms,
-      String location_type, String budget) {
+  void _fetchDataRec(String city, String places, String levelRooms,
+      String locationType, String budget) {
     FirebaseFirestore.instance
         .collection('hotels_ru')
         .where('city', isEqualTo: city)
         .where('places', isEqualTo: places)
-        .where('level_rooms', isEqualTo: level_rooms)
-        .where('location_type', isEqualTo: location_type)
+        .where('level_rooms', isEqualTo: levelRooms)
+        .where('location_type', isEqualTo: locationType)
         .where('budget', isEqualTo: budget)
         .limit(widget.isRec ? 3 : _pageSize)
         .get()
@@ -89,8 +89,8 @@ class _ListHotelsViewState extends State<ListHotelsView> {
     });
   }
 
-  void _loadMoreRec(String city, String places, String level_rooms,
-      String location_type, String budget) {
+  void _loadMoreRec(String city, String places, String levelRooms,
+      String locationType, String budget) {
     if (!_isFetchingMore) {
       setState(() {
         _isFetchingMore = true;
@@ -101,8 +101,8 @@ class _ListHotelsViewState extends State<ListHotelsView> {
           .orderBy('price')
           .where('city', isEqualTo: city)
           .where('places', isEqualTo: places)
-          .where('level_rooms', isEqualTo: level_rooms)
-          .where('location_type', isEqualTo: location_type)
+          .where('level_rooms', isEqualTo: levelRooms)
+          .where('location_type', isEqualTo: locationType)
           .where('budget', isEqualTo: budget)
           .startAfterDocument(_documents.last)
           .limit(_pageSize)
@@ -191,7 +191,6 @@ class _ListHotelsViewState extends State<ListHotelsView> {
 
   @override
   Widget build(BuildContext context) {
-    String docId = '';
     SearchHotels args;
     if (widget.isRec) {
       args =

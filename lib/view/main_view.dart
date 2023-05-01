@@ -2,6 +2,7 @@ import 'package:animate_gradient/animate_gradient.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_hotels_app/data/search_hotels.dart';
 import 'package:find_hotels_app/viewModel/num_person_viewmodel.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
@@ -10,7 +11,6 @@ import 'package:provider/provider.dart';
 
 import '../firebase/get_hotels.dart';
 import '../widgets/custom_text.dart';
-import 'list_hotels_view.dart';
 
 class MainView extends StatefulWidget {
   const MainView({
@@ -62,8 +62,10 @@ class _MainViewState extends State<MainView>
   }
 
   String removeExtraCharacters(String inputString) {
-    RegExp regExp = new RegExp(r"[^a-zA-Zа-яА-Я]");
-    print('asdfasdf ${inputString.replaceAll(regExp, "")}');
+    RegExp regExp = RegExp(r"[^a-zA-Zа-яА-Я]");
+    if (kDebugMode) {
+      print('search ${inputString.replaceAll(regExp, "")}');
+    }
     return inputString.replaceAll(regExp, "");
   }
 
@@ -358,7 +360,7 @@ class _MainViewState extends State<MainView>
               width: double.infinity,
               decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
+                    colors: const [
                       Color(0xffFF001F),
                       Color(0xff007AFF),
                     ],

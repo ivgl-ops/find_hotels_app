@@ -1,7 +1,6 @@
 import 'package:find_hotels_app/view/main_view.dart';
 import 'package:find_hotels_app/view/screen_paid.dart';
 import 'package:find_hotels_app/view/screen_user.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'favorite_hotels_view.dart';
@@ -9,7 +8,7 @@ import 'favorite_hotels_view.dart';
   class StartView extends StatefulWidget {
     final int index;
 
-    StartView({super.key,  required this.index});
+    const StartView({super.key,  required this.index});
 
     @override
     State<StartView> createState() => StartViewState();

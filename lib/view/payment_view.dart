@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../data/apartmentsData.dart';
@@ -86,8 +87,10 @@ class _PaymentViewState extends State<PaymentView> {
             ),
           );
 
-          print(
+          if (kDebugMode) {
+            print(
               'addd ${args.id}, ${args.price}, ${args.people}, ${args.days}, ${args.searchResult}');
+          }
         },
         child: Container(
           height: 105,

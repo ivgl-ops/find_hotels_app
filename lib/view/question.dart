@@ -1,15 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:find_hotels_app/view/list_hotels_view.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/custom_text.dart';
 
 class QuestionScreen extends StatefulWidget {
+  const QuestionScreen({super.key});
+
   @override
-  _QuestionScreenState createState() => _QuestionScreenState();
+  QuestionScreenState createState() => QuestionScreenState();
 }
 
-class _QuestionScreenState extends State<QuestionScreen> {
+class QuestionScreenState extends State<QuestionScreen> {
   int _currentQuestionIndex = 0;
   List search = [];
   bool notFound = false;
@@ -17,16 +20,16 @@ class _QuestionScreenState extends State<QuestionScreen> {
   void searchfromFirebase(
     String city,
     String places,
-    String level_rooms,
-    String location_type,
+    String levelRooms,
+    String locationType,
     String budget,
   ) async {
     final result = await FirebaseFirestore.instance
         .collection('hotels_ru')
         .where('city', isEqualTo: city)
         .where('places', isEqualTo: places)
-        .where('level_rooms', isEqualTo: level_rooms)
-        .where('location_type', isEqualTo: location_type)
+        .where('level_rooms', isEqualTo: levelRooms)
+        .where('location_type', isEqualTo: locationType)
         .where('budget', isEqualTo: budget)
         .get();
 
@@ -37,10 +40,12 @@ class _QuestionScreenState extends State<QuestionScreen> {
                 ...doc.data(),
               })
           .toList();
-      print('count ${search.length}');
+      if (kDebugMode) {
+        print('count ${search.length}');
+      }
     });
 
-      if (search.length > 0) {
+      if (search.isNotEmpty) {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -48,8 +53,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
               isRec: true,
               city: city,
               places: places,
-              level_rooms: level_rooms,
-              location_type: location_type,
+              levelRooms: levelRooms,
+              locationType: locationType,
               budget: budget,
             ),
           ),

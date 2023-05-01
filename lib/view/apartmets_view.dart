@@ -314,6 +314,8 @@ class _ApartmentViewState extends State<ApartmentView> {
                           height: 20,
                         ),
                         Container(
+                          padding: EdgeInsets.only(
+                              left: 15, right: 10, top: 5, bottom: 10),
                           margin: EdgeInsets.symmetric(horizontal: 5),
                           child: CustomText(
                               text:

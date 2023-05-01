@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class AddDataView extends StatefulWidget {
@@ -15,7 +16,6 @@ class _AddDataViewState extends State<AddDataView> {
     // Получаем ссылку на коллекцию в Firestore
     CollectionReference itemsRef =
         FirebaseFirestore.instance.collection('hotels_ru');
-    List<String> budget = ['Дешевый', 'Средний', 'Дорогой'];
     List<String> city = [
       'Москва',
       'Новосибирск',
@@ -33,12 +33,12 @@ class _AddDataViewState extends State<AddDataView> {
       'https://loukoster.com/wp-content/uploads/2021/10/273076965.jpg',
       'https://storage.googleapis.com/xo-ua/2022/02/7270febb-48761643.jpg'
     ];
-    List<String> level_rooms = [
+    List<String> levelRooms = [
       'Cтандартный',
       'Люкс',
       'Номер повышенной комфортности'
     ];
-    List<String> location_type = [
+    List<String> locationType = [
       'Центр города',
       'Рядом с аэропортом',
       'Туристическая часть',
@@ -102,24 +102,26 @@ class _AddDataViewState extends State<AddDataView> {
         // string
         'img': img[random.nextInt(img.length)],
         // string
-        'level_rooms': level_rooms[random.nextInt(level_rooms.length)],
+        'level_rooms': levelRooms[random.nextInt(levelRooms.length)],
         //bool
         'like': false,
         // string
-        'location_type': location_type[random.nextInt(location_type.length)],
+        'location_type': locationType[random.nextInt(locationType.length)],
         // string
         'name': name[random.nextInt(name.length)],
         // string
         'places': place[random.nextInt(place.length)],
         // string
-        'price': '${price}',
+        'price': '$price',
         // string
         'rate': '${random.nextInt(8) + 3}',
         // string
       });
     }
 
-    print('Документы успешно созданы!');
+    if (kDebugMode) {
+      print('Документы успешно созданы!');
+    }
   }
 
   @override

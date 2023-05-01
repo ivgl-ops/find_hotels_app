@@ -1,4 +1,3 @@
-import 'package:find_hotels_app/data/apartmentsData.dart';
 import 'package:find_hotels_app/data/flexibleData.dart';
 import 'package:find_hotels_app/data/sort.dart';
 import 'package:find_hotels_app/firebase/get_hotels.dart';
@@ -70,8 +69,8 @@ class MyApp extends StatelessWidget {
                 isRec: false,
                 city: '',
                 places: '',
-                level_rooms: '',
-                location_type: '',
+                levelRooms: '',
+                locationType: '',
                 budget: '',
               )),
           '/filter': ((context) => const FilterHotelsView()),

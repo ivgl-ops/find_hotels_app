@@ -168,7 +168,9 @@ class _PayloadViewState extends State<PayloadView> {
                         "Добро пожаловать в ${list['name'].toString().toLowerCase()}",
                         "Спасибо за оплату! Мы ждем вас с нетерпением. Приятного отдыха!");
                     updateFavoriteField(args.id, true);
-                    print(args.id);
+                    if (kDebugMode) {
+                      print(args.id);
+                    }
                     Navigator.pushReplacementNamed(
                       context,
                       '/payment_confirmation',
@@ -191,12 +193,14 @@ class _PayloadViewState extends State<PayloadView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            CustomText(
-              text: 'Оплата',
-              size: 24,
+            Padding(
+              padding: EdgeInsets.only(left: 12, top: 12),
+              child: CustomText(
+                text: 'Оплатить ${args.price} ₽\nномер\nв ${args.searchResult['name']}'.toUpperCase(),
+                size: 20,
+              ),
             ),
-            SizedBox(height: 20),
-            CustomText(text: args.price.toString() + " ₽", size: 24),
+            SizedBox(height: 50),
             Container(
               decoration: BoxDecoration(
                   color: Colors.grey[200],
